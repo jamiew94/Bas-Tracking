@@ -119,6 +119,28 @@ table.bas tr.timing td{background:var(--amber-light);}
 .job-row .job-meta{color:var(--text-muted);font-family:'Courier New',monospace;font-size:12px;}
 .job-row .job-total{font-family:'Courier New',monospace;font-weight:bold;color:var(--navy);}
 .job-row.outside-period{opacity:0.45;}
+/* ── PAYMENTS TAB ── */
+.pay-row{display:grid;grid-template-columns:95px 105px 1fr 115px 115px 130px;gap:0;border-bottom:1px solid var(--grey-border);align-items:center;}
+.pay-row:nth-child(even){background:#fafbfd;}
+.pay-row:hover{background:#f0f3fa;}
+.pay-row.pay-header{background:var(--navy-mid);color:white;font-size:11px;font-family:'Courier New',monospace;letter-spacing:0.5px;font-weight:bold;}
+.pay-row.pay-header .pc{color:white;}
+.pay-row.section-divider{background:var(--grey-bg);border-top:2px solid var(--grey-border);}
+.pay-row.section-divider .pc{font-size:11px;font-family:'Courier New',monospace;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);padding:10px 10px 6px;}
+.pc{padding:8px 10px;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pc.right{text-align:right;font-family:'Courier New',monospace;}
+.pc.center{text-align:center;}
+.pay-pill{display:inline-block;font-size:11px;padding:3px 9px;border-radius:100px;font-weight:bold;font-family:'Courier New',monospace;white-space:nowrap;}
+.pay-paid{background:var(--green-light);color:var(--green);}
+.pay-unpaid{background:var(--red-light);color:var(--red);}
+.pay-draft{background:var(--amber-light);color:#7a4a00;}
+.pay-surplus{background:var(--blue-light);color:var(--blue);}
+.pay-summary{background:var(--navy);color:white;border-radius:8px;padding:14px 18px;margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+.ps-item .ps-label{font-size:11px;color:rgba(255,255,255,0.6);font-family:'Courier New',monospace;margin-bottom:4px;}
+.ps-item .ps-val{font-size:18px;font-weight:bold;font-family:'Courier New',monospace;color:white;}
+.ps-item .ps-val.green{color:#6ddc8b;}
+.ps-item .ps-val.red{color:#ff8080;}
+.ps-item .ps-val.amber{color:#ffc94d;}
 /* ── INVOICE TAB ── */
 .inv-drop{border:2px dashed var(--grey-border);border-radius:var(--radius);padding:30px 20px;text-align:center;cursor:pointer;background:var(--grey-bg);transition:all 0.15s;position:relative;margin-bottom:14px;}
 .inv-drop:hover,.inv-drop.dragover{border-color:var(--navy-light);background:#eef1f8;}
@@ -178,6 +200,7 @@ table.inv td.mono{font-family:'Courier New',monospace;}
     <div class="tab" onclick="switchTab('reconcile')" id="tab-btn-reconcile">Reconcile</div>
     <div class="tab" onclick="switchTab('tax')" id="tab-btn-tax">Tax Estimate</div>
     <div class="tab" onclick="switchTab('invoices')" id="tab-btn-invoices">Invoices</div>
+    <div class="tab" onclick="switchTab('payments')" id="tab-btn-payments">Payments</div>
   </div>
 
   <!-- ═══ UPLOAD ═══ -->
@@ -393,6 +416,70 @@ table.inv td.mono{font-family:'Courier New',monospace;}
     </div>
   </div>
 
+  <!-- ═══ PAYMENTS ═══ -->
+  <div id="tab-payments" style="display:none">
+    <div class="card">
+      <div class="card-header">Payment Matching — Invoices vs Bank</div>
+      <div class="card-body">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Upload your invoice PDFs and the income bank CSV. Matches each invoice to a payment by rego. Shows exactly what's paid (archive it) and what's outstanding.</p>
+        <div class="upload-grid">
+          <div class="upload-zone" id="pay-zone-pdf" onclick="document.getElementById('pay-file-pdf').click()">
+            <div class="uz-icon" id="pay-pdf-icon">📄</div>
+            <div class="uz-title" id="pay-pdf-label">Invoice PDFs</div>
+            <div class="uz-sub">Drop all invoices for the period<br>CarGuys_REGO_Make_Model.pdf</div>
+            <input type="file" id="pay-file-pdf" accept=".pdf" multiple onchange="loadPayPDFs(this.files)">
+          </div>
+          <div class="upload-zone" id="pay-zone-csv" onclick="document.getElementById('pay-file-csv').click()">
+            <div class="uz-icon" id="pay-csv-icon">📊</div>
+            <div class="uz-title" id="pay-csv-label">Income bank CSV</div>
+            <div class="uz-sub">HSBC export — account ...087<br>Melissa Farquhar payments</div>
+            <input type="file" id="pay-file-csv" accept=".csv" onchange="loadPayCSV(this.files[0])">
+          </div>
+        </div>
+
+        <div id="pay-results" style="display:none">
+          <div class="metrics-grid" id="pay-metrics"></div>
+
+          <!-- matched invoices -->
+          <div class="section-title">Invoice payment status</div>
+          <div class="toolbar">
+            <select id="pay-filter" onchange="renderPayTable()">
+              <option value="all">All</option>
+              <option value="paid">✓ Paid — archive</option>
+              <option value="unpaid">✗ Unpaid — keep</option>
+              <option value="surplus">Paid — no invoice yet</option>
+            </select>
+            <span class="txn-counter" id="pay-count"></span>
+          </div>
+
+          <div class="table-wrap">
+            <div class="pay-row pay-header">
+              <div class="pc">Date</div>
+              <div class="pc">Rego</div>
+              <div class="pc">Vehicle</div>
+              <div class="pc right">Invoice</div>
+              <div class="pc right">Received</div>
+              <div class="pc center">Status</div>
+            </div>
+            <div id="pay-body"></div>
+          </div>
+          <div class="empty-state" id="pay-empty" style="display:none">No results for this filter.</div>
+
+          <div class="pay-summary" id="pay-summary"></div>
+
+          <div class="action-row">
+            <button class="btn btn-green" onclick="exportPayCSV()">↓ Export payment register CSV</button>
+          </div>
+          <div class="howto" style="margin-top:14px;">
+            <strong>✓ Paid — Archive</strong> Invoice matched to a bank payment by rego. Safe to move to archive.<br>
+            <strong>✗ Unpaid — Keep</strong> Invoice PDF exists but no matching payment found yet. Leave in active folder.<br>
+            <strong>Paid — no invoice yet</strong> Bank shows a payment for this rego but no invoice PDF uploaded. Likely a draft not yet finalised.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 <div id="toast"></div>
 
@@ -408,6 +495,8 @@ let loaded={income:false,expense:false};
 let reconJobs=[];
 let periodStart=null,periodEnd=null;
 let invoices=[];
+let payInvoices=[];   // invoices loaded in payments tab
+let payPayments=[];   // bank payments loaded in payments tab
 
 const CATS=[
   {value:'income',label:'Business income (GST)'},
@@ -452,7 +541,7 @@ function toast(msg){
 //  TABS
 // ═══════════════════════════════════════════════════════
 function switchTab(name){
-  ['upload','transactions','bas','reconcile','tax','invoices'].forEach(t=>{
+  ['upload','transactions','bas','reconcile','tax','invoices','payments'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===name?'':'none';
     document.getElementById('tab-btn-'+t).classList.toggle('active',t===name);
   });
@@ -461,6 +550,7 @@ function switchTab(name){
   if(name==='reconcile')updateReconcile();
   if(name==='tax')updateTax();
   if(name==='invoices')renderInvoiceTable();
+  if(name==='payments')renderPayTable();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1021,6 +1111,242 @@ function clearAll(){
   document.getElementById('inv-file-list').innerHTML='';document.getElementById('inv-results').style.display='none';
   renderTable();updateBAS();updateReconcile();updateTax();
   switchTab('upload');toast('Cleared.');
+}
+
+// ═══════════════════════════════════════════════════════
+//  PAYMENTS TAB
+// ═══════════════════════════════════════════════════════
+
+// Extract rego from a Melissa Farquhar bank transfer description
+function extractRegoFromDesc(desc){
+  // New format: "TRANSFER RTP 1HXQ129 CTBAAUSNXXXN... MELISSA FARQUHAR ... 1HXQ129 ..."
+  // Rego appears right after "TRANSFER RTP " at the start
+  const rtpMatch=desc.match(/TRANSFER\s+RTP\s+([A-Z0-9]{4,8})\s/i);
+  if(rtpMatch)return rtpMatch[1].toUpperCase();
+  // Fallback: scan for any rego-like token (5-8 alphanumeric, not pure numbers)
+  const tokens=desc.split(/\s+/);
+  for(const t of tokens){
+    if(/^[A-Z0-9]{5,8}$/.test(t)&&/[A-Z]/.test(t)&&!/^(TRANSFER|MELISSA|FARQUHAR|CTBAAUSNXXXN|INTERNET|BANKING|SALARY|AUD|CREDIT|INTEREST)$/i.test(t)){
+      return t.toUpperCase();
+    }
+  }
+  return null;
+}
+
+// Parse payments CSV (income account - same format as main CSV)
+function loadPayCSV(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split('\n').filter(l=>l.trim());
+    payPayments=[];
+    for(let i=1;i<lines.length;i++){
+      const cols=splitCSVLine(lines[i].trim());
+      if(cols.length<3)continue;
+      const date=cols[0].trim(),desc=cols[1].trim();
+      const amt=parseFloat(cols[2].replace(/"/g,'').replace(/,/g,'').trim());
+      if(isNaN(amt)||amt<=0)continue;
+      if(!desc.toUpperCase().includes('MELISSA FARQUHAR'))continue;
+      const rego=extractRegoFromDesc(desc);
+      if(!rego)continue;
+      payPayments.push({date,desc,amount:amt,rego});
+    }
+    payPayments.sort((a,b)=>parseDateSort(a.date)-parseDateSort(b.date));
+    document.getElementById('pay-zone-csv').classList.add('loaded');
+    document.getElementById('pay-csv-icon').textContent='✅';
+    document.getElementById('pay-csv-label').textContent=file.name+' — '+payPayments.length+' payments';
+    matchAndRender();
+    toast('✓ Loaded '+payPayments.length+' Melissa payments');
+    document.getElementById('pay-file-csv').value='';
+  };
+  reader.readAsText(file);
+}
+
+// Load invoice PDFs for payments tab — reuse parseInvoicePDF
+async function loadPayPDFs(files){
+  const pdfs=Array.from(files).filter(f=>f.name.toLowerCase().endsWith('.pdf'));
+  if(!pdfs.length){toast('No PDFs selected.');return;}
+  payInvoices=[];
+  document.getElementById('pay-zone-pdf').classList.remove('loaded');
+  document.getElementById('pay-pdf-icon').textContent='⏳';
+  document.getElementById('pay-pdf-label').textContent='Reading '+pdfs.length+' PDFs…';
+  for(const file of pdfs){
+    try{
+      const inv=await parseInvoicePDF(file);
+      payInvoices.push(inv);
+    }catch(e){
+      payInvoices.push({filename:file.name,rego:extractRegoFromFilename(file.name),date:'?',vehicle:'?',total:0,gst:0,hasGST:false,error:e.message});
+    }
+  }
+  payInvoices.sort((a,b)=>parseDateSortDMY(a.date)-parseDateSortDMY(b.date));
+  document.getElementById('pay-zone-pdf').classList.add('loaded');
+  document.getElementById('pay-pdf-icon').textContent='✅';
+  document.getElementById('pay-pdf-label').textContent=pdfs.length+' invoices loaded';
+  matchAndRender();
+  toast('✓ Loaded '+pdfs.length+' invoices');
+  document.getElementById('pay-file-pdf').value='';
+}
+
+function extractRegoFromFilename(name){
+  const m=name.match(/CarGuys_([A-Z0-9]+)_/i);
+  return m?m[1].toUpperCase():'?';
+}
+
+// Core matching: by rego
+function buildMatches(){
+  const results=[];
+  const usedPayments=new Set();
+
+  // For each invoice, find a matching payment
+  for(const inv of payInvoices){
+    const payment=payPayments.find((p,idx)=>!usedPayments.has(idx)&&p.rego.toUpperCase()===inv.rego.toUpperCase());
+    if(payment){
+      const pidx=payPayments.indexOf(payment);
+      usedPayments.add(pidx);
+      const diff=payment.amount-inv.total;
+      results.push({
+        type:'invoice',
+        rego:inv.rego,
+        date:inv.date,
+        vehicle:inv.vehicle||'',
+        invoiceTotal:inv.total,
+        received:payment.amount,
+        paymentDate:payment.date,
+        diff,
+        status:'paid',
+        filename:inv.filename,
+      });
+    }else{
+      results.push({
+        type:'invoice',
+        rego:inv.rego,
+        date:inv.date,
+        vehicle:inv.vehicle||'',
+        invoiceTotal:inv.total,
+        received:0,
+        paymentDate:null,
+        diff:-inv.total,
+        status:'unpaid',
+        filename:inv.filename,
+      });
+    }
+  }
+
+  // Any payments with no matching invoice = paid for draft/unfinished work
+  payPayments.forEach((p,idx)=>{
+    if(!usedPayments.has(idx)){
+      results.push({
+        type:'surplus',
+        rego:p.rego,
+        date:'—',
+        vehicle:'—',
+        invoiceTotal:0,
+        received:p.amount,
+        paymentDate:p.date,
+        diff:p.amount,
+        status:'surplus',
+        filename:'',
+      });
+    }
+  });
+
+  return results;
+}
+
+function matchAndRender(){
+  if(!payInvoices.length&&!payPayments.length)return;
+  document.getElementById('pay-results').style.display='';
+  renderPayTable();
+}
+
+function renderPayTable(){
+  if(!payInvoices.length&&!payPayments.length)return;
+  const matches=buildMatches();
+  const filter=document.getElementById('pay-filter').value;
+
+  let rows=matches;
+  if(filter==='paid')rows=matches.filter(m=>m.status==='paid');
+  if(filter==='unpaid')rows=matches.filter(m=>m.status==='unpaid');
+  if(filter==='surplus')rows=matches.filter(m=>m.status==='surplus');
+
+  document.getElementById('pay-count').textContent=rows.length+' item'+(rows.length!==1?'s':'');
+
+  // Metrics
+  const paid=matches.filter(m=>m.status==='paid');
+  const unpaid=matches.filter(m=>m.status==='unpaid');
+  const surplus=matches.filter(m=>m.status==='surplus');
+  const totalInvoiced=matches.filter(m=>m.type==='invoice').reduce((s,m)=>s+m.invoiceTotal,0);
+  const totalReceived=payPayments.reduce((s,p)=>s+p.amount,0);
+  const totalOutstanding=unpaid.reduce((s,m)=>s+m.invoiceTotal,0);
+  const totalSurplus=surplus.reduce((s,m)=>s+m.received,0);
+
+  document.getElementById('pay-metrics').innerHTML=[
+    {label:'Invoices uploaded',val:payInvoices.length,cls:'highlight'},
+    {label:'✓ Paid — archive',val:paid.length,cls:'green'},
+    {label:'✗ Unpaid — keep',val:unpaid.length,cls:unpaid.length>0?'red':'green'},
+    {label:'Paid — no invoice yet',val:surplus.length,cls:surplus.length>0?'amber':''},
+    {label:'Total invoiced',val:fmt(totalInvoiced),cls:''},
+    {label:'Total received',val:fmt(totalReceived),cls:''},
+  ].map(m=>'<div class="metric '+m.cls+'"><div class="m-label">'+m.label+'</div><div class="m-val" style="'+(typeof m.val==='string'&&m.val.startsWith('$')?'font-size:17px':'')+'">'+m.val+'</div></div>').join('');
+
+  const body=document.getElementById('pay-body');
+  const empty=document.getElementById('pay-empty');
+  if(!rows.length){body.innerHTML='';empty.style.display='';return;}
+  empty.style.display='none';
+
+  body.innerHTML=rows.map(m=>{
+    let pill,invCell,recCell;
+    if(m.status==='paid'){
+      pill='<span class="pay-pill pay-paid">✓ Paid — archive</span>';
+      invCell='<div class="pc right">'+fmt(m.invoiceTotal)+'</div>';
+      recCell='<div class="pc right" style="color:var(--green)">'+fmt(m.received)+'</div>';
+    }else if(m.status==='unpaid'){
+      pill='<span class="pay-pill pay-unpaid">✗ Unpaid — keep</span>';
+      invCell='<div class="pc right">'+fmt(m.invoiceTotal)+'</div>';
+      recCell='<div class="pc right" style="color:var(--text-muted)">—</div>';
+    }else{
+      pill='<span class="pay-pill pay-surplus">Paid — no invoice</span>';
+      invCell='<div class="pc right" style="color:var(--text-muted)">—</div>';
+      recCell='<div class="pc right" style="color:var(--blue)">'+fmt(m.received)+'</div>';
+    }
+    const dateCell=m.status==='surplus'?m.paymentDate:m.date;
+    return'<div class="pay-row">'+
+      '<div class="pc" style="color:var(--text-muted);font-family:\'Courier New\',monospace;font-size:12px">'+eh(dateCell||'—')+'</div>'+
+      '<div class="pc" style="font-weight:bold;font-family:\'Courier New\',monospace;color:var(--navy)">'+eh(m.rego)+'</div>'+
+      '<div class="pc" style="font-size:12px" title="'+eh(m.filename)+'">'+eh(m.vehicle||m.filename||'—')+'</div>'+
+      invCell+recCell+
+      '<div class="pc center">'+pill+'</div>'+
+      '</div>';
+  }).join('');
+
+  // Summary bar
+  const net=totalReceived-totalInvoiced;
+  document.getElementById('pay-summary').innerHTML=
+    '<div class="ps-item"><div class="ps-label">Total invoiced</div><div class="ps-val">'+fmt(totalInvoiced)+'</div></div>'+
+    '<div class="ps-item"><div class="ps-label">Total received</div><div class="ps-val">'+fmt(totalReceived)+'</div></div>'+
+    '<div class="ps-item"><div class="ps-label">Outstanding</div><div class="ps-val red">'+fmt(totalOutstanding)+'</div></div>'+
+    (totalSurplus>0?'<div class="ps-item"><div class="ps-label">Paid ahead (drafts)</div><div class="ps-val amber">'+fmt(totalSurplus)+'</div></div>':'')+
+    '<div class="ps-item"><div class="ps-label">Net position</div><div class="ps-val '+(net>=0?'green':'red')+'">'+(net>=0?'+':'')+fmt(net)+'</div></div>';
+}
+
+function exportPayCSV(){
+  const matches=buildMatches();
+  if(!matches.length){toast('Nothing to export.');return;}
+  const header='Rego,Vehicle,Invoice Date,Invoice Total,Payment Date,Received,Status\n';
+  const rows=matches.map(m=>[
+    '"'+m.rego+'"',
+    '"'+(m.vehicle||'')+'""',
+    '"'+m.date+'"',
+    m.invoiceTotal.toFixed(2),
+    '"'+(m.paymentDate||'')+'""',
+    m.received.toFixed(2),
+    '"'+m.status+'"'
+  ].join(',')).join('\n');
+  const blob=new Blob([header+rows],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='JW_Payments_'+new Date().toLocaleDateString('en-AU').replace(/\//g,'-')+'.csv';
+  a.click();URL.revokeObjectURL(a.href);
+  toast('✓ Payment register exported');
 }
 
 // Init
