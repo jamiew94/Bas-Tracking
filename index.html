@@ -169,6 +169,45 @@ table.inv td.mono{font-family:'Courier New',monospace;}
 .pill-nogst{background:var(--blue-light);color:var(--blue);}
 .pill-processing{background:var(--amber-light);color:#7a4a00;}
 .pill-error{background:var(--grey-bg);color:var(--text-muted);}
+/* ── DASHBOARD ── */
+.dash-hero{background:var(--navy);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;color:white;}
+.dash-hero-title{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.5);font-family:'Courier New',monospace;margin-bottom:6px;}
+.dash-next{font-size:20px;font-weight:bold;color:white;line-height:1.3;}
+.dash-next.all-good{color:#6ddc8b;}
+.dash-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.dash-step{border-radius:var(--radius);border:1.5px solid var(--grey-border);background:white;overflow:hidden;display:flex;align-items:stretch;cursor:pointer;transition:box-shadow 0.15s;}
+.dash-step:hover{box-shadow:0 2px 12px rgba(26,39,68,0.12);}
+.dash-step-icon{width:48px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.dash-step.step-done .dash-step-icon{background:var(--green-light);}
+.dash-step.step-partial .dash-step-icon{background:var(--amber-light);}
+.dash-step.step-todo .dash-step-icon{background:var(--grey-bg);}
+.dash-step.step-alert .dash-step-icon{background:var(--red-light);}
+.dash-step-body{flex:1;padding:10px 14px;min-width:0;}
+.dash-step-title{font-size:13px;font-weight:bold;color:var(--navy);margin-bottom:2px;}
+.dash-step-desc{font-size:12px;color:var(--text-muted);font-family:'Courier New',monospace;line-height:1.5;}
+.dash-step-badge{flex-shrink:0;padding:0 14px;display:flex;align-items:center;}
+.dash-step-badge span{font-size:12px;font-family:'Courier New',monospace;font-weight:bold;white-space:nowrap;}
+.dash-step.step-done .dash-step-badge span{color:var(--green);}
+.dash-step.step-partial .dash-step-badge span{color:#8a5500;}
+.dash-step.step-todo .dash-step-badge span{color:var(--text-muted);}
+.dash-step.step-alert .dash-step-badge span{color:var(--red);}
+.dash-outstanding{background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;}
+.dash-outstanding-header{background:var(--red);color:white;padding:10px 16px;font-size:13px;font-weight:bold;letter-spacing:0.5px;display:flex;justify-content:space-between;align-items:center;}
+.dash-outstanding-header.green{background:var(--green);}
+.dash-outstanding-header.amber{background:var(--amber);}
+.dash-out-row{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:1px solid var(--grey-border);font-size:13px;}
+.dash-out-row:last-child{border-bottom:none;}
+.dash-out-row:nth-child(even){background:#fafbfd;}
+.dash-out-rego{font-family:'Courier New',monospace;font-weight:bold;color:var(--navy);min-width:90px;}
+.dash-out-vehicle{color:var(--text-muted);flex:1;padding:0 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dash-out-amt{font-family:'Courier New',monospace;font-weight:bold;color:var(--red);}
+.dash-quick-upload{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.dash-up-zone{border:1.5px dashed var(--grey-border);border-radius:8px;padding:14px;text-align:center;cursor:pointer;background:var(--grey-bg);font-size:12px;color:var(--text-muted);transition:all 0.15s;position:relative;}
+.dash-up-zone:hover{border-color:var(--navy-light);background:#eef1f8;}
+.dash-up-zone.loaded{border-style:solid;border-color:var(--green);background:var(--green-light);color:var(--green);}
+.dash-up-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.dash-up-icon{font-size:20px;margin-bottom:4px;}
+.dash-up-label{font-family:'Courier New',monospace;font-size:11px;}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-family:'Courier New',monospace;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;}
 @media(max-width:600px){
   .upload-grid{grid-template-columns:1fr;}
@@ -188,19 +227,52 @@ table.inv td.mono{font-family:'Courier New',monospace;}
   </div>
   <div class="header-actions">
     <button class="btn-header" onclick="exportCSV()">↓ Export CSV</button>
-    <button class="btn-header" onclick="clearAll()">✕ Clear</button>
+    <button class="btn-header" onclick="clearCurrentTab()">✕ Clear</button>
   </div>
 </div>
 
 <div class="container">
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('upload')" id="tab-btn-upload">Upload</div>
-    <div class="tab" onclick="switchTab('transactions')" id="tab-btn-transactions">Transactions</div>
-    <div class="tab" onclick="switchTab('bas')" id="tab-btn-bas">BAS Summary</div>
-    <div class="tab" onclick="switchTab('reconcile')" id="tab-btn-reconcile">Reconcile</div>
-    <div class="tab" onclick="switchTab('tax')" id="tab-btn-tax">Tax Estimate</div>
+    <div class="tab active" onclick="switchTab('dashboard')" id="tab-btn-dashboard">Dashboard</div>
     <div class="tab" onclick="switchTab('invoices')" id="tab-btn-invoices">Invoices</div>
     <div class="tab" onclick="switchTab('payments')" id="tab-btn-payments">Payments</div>
+    <div class="tab" onclick="switchTab('reconcile')" id="tab-btn-reconcile">Reconcile</div>
+    <div class="tab" onclick="switchTab('bas')" id="tab-btn-bas">BAS Summary</div>
+    <div class="tab" onclick="switchTab('tax')" id="tab-btn-tax">Tax Estimate</div>
+    <div class="tab" onclick="switchTab('upload')" id="tab-btn-upload">Bank Data</div>
+    <div class="tab" onclick="switchTab('transactions')" id="tab-btn-transactions">Transactions</div>
+  </div>
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div id="tab-dashboard">
+    <!-- Next action hero -->
+    <div class="dash-hero">
+      <div class="dash-hero-title">Next action</div>
+      <div class="dash-next" id="dash-next-action">Load your invoice PDFs to get started.</div>
+    </div>
+
+    <!-- Quick upload strip -->
+    <div class="dash-quick-upload">
+      <div class="dash-up-zone" id="dash-zone-pdf" onclick="document.getElementById('dash-file-pdf').click()">
+        <input type="file" id="dash-file-pdf" accept=".pdf" multiple onchange="loadPayPDFs(this.files);loadInvoicesFromDash(this.files)">
+        <div class="dash-up-icon" id="dash-pdf-icon">📄</div>
+        <div class="dash-up-label" id="dash-pdf-label">Drop invoice PDFs</div>
+      </div>
+      <div class="dash-up-zone" id="dash-zone-csv" onclick="document.getElementById('dash-file-csv').click()">
+        <input type="file" id="dash-file-csv" accept=".csv" onchange="loadPayCSV(this.files[0]);loadCSV(this,'income');updateDashboard()">
+        <div class="dash-up-icon" id="dash-csv-icon">📊</div>
+        <div class="dash-up-label" id="dash-csv-label">Drop income CSV (HSBC ...087)</div>
+      </div>
+    </div>
+
+    <!-- Step checklist -->
+    <div class="dash-steps" id="dash-steps"></div>
+
+    <!-- Outstanding invoices -->
+    <div class="dash-outstanding" id="dash-outstanding" style="display:none">
+      <div class="dash-outstanding-header" id="dash-out-header">Outstanding invoices</div>
+      <div id="dash-out-body"></div>
+    </div>
   </div>
 
   <!-- ═══ UPLOAD ═══ -->
@@ -541,16 +613,161 @@ function toast(msg){
 //  TABS
 // ═══════════════════════════════════════════════════════
 function switchTab(name){
-  ['upload','transactions','bas','reconcile','tax','invoices','payments'].forEach(t=>{
+  currentTab=name;
+  ['dashboard','upload','transactions','bas','reconcile','tax','invoices','payments'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===name?'':'none';
     document.getElementById('tab-btn-'+t).classList.toggle('active',t===name);
   });
+  if(name==='dashboard')updateDashboard();
   if(name==='transactions')renderTable();
   if(name==='bas')updateBAS();
   if(name==='reconcile')updateReconcile();
   if(name==='tax')updateTax();
   if(name==='invoices')renderInvoiceTable();
   if(name==='payments')renderPayTable();
+}
+
+// ═══════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════
+function loadInvoicesFromDash(files){
+  // Mirror PDFs into both invoices and payInvoices arrays
+  handleInvoicePDFs(files);
+  // dash zone update handled by individual loaders via updateDashboard calls
+}
+
+function updateDashboard(){
+  // ── Step states ──
+  const hasInvoices=payInvoices.length>0||invoices.length>0;
+  const invCount=Math.max(payInvoices.length,invoices.length);
+  const hasPayCSV=payPayments.length>0;
+  const hasBankCSV=transactions.length>0;
+  const hasJSON=reconJobs.length>0;
+  const matches=hasInvoices&&hasPayCSV?buildMatches():[];
+  const unpaid=matches.filter(m=>m.status==='unpaid');
+  const paid=matches.filter(m=>m.status==='paid');
+  const surplus=matches.filter(m=>m.status==='surplus');
+  const {incGST,expGST,netGST}=calcBAS();
+  const basReady=hasBankCSV&&incGST>0;
+
+  // ── Next action ──
+  let nextAction='Load your invoice PDFs to get started.';
+  let nextDone=false;
+  if(!hasInvoices) nextAction='Drop your invoice PDFs in the box above to get started.';
+  else if(!hasPayCSV) nextAction='Drop your income bank CSV (HSBC ...087) to match payments against invoices.';
+  else if(unpaid.length>0) nextAction=unpaid.length+' invoice'+(unpaid.length>1?'s are':' is')+' unpaid — chase up or wait for next payment run.';
+  else if(surplus.length>0) nextAction=surplus.length+' payment'+(surplus.length>1?'s have':' has')+' no invoice yet — finalise those drafts in the reports app.';
+  else if(!hasBankCSV) nextAction='Load your full quarter bank CSV on the Bank Data tab to prepare your BAS.';
+  else if(!basReady) nextAction='BAS data loaded — review the BAS Summary tab before lodging.';
+  else{nextAction='All invoices matched and BAS data loaded. ✓ You\'re up to date.';nextDone=true;}
+
+  const nextEl=document.getElementById('dash-next-action');
+  nextEl.textContent=nextAction;
+  nextEl.className='dash-next'+(nextDone?' all-good':'');
+
+  // ── Quick upload zone sync ──
+  if(hasInvoices){
+    document.getElementById('dash-zone-pdf').classList.add('loaded');
+    document.getElementById('dash-pdf-icon').textContent='✅';
+    document.getElementById('dash-pdf-label').textContent=invCount+' invoice'+(invCount!==1?'s':'')+ ' loaded';
+  }
+  if(hasPayCSV){
+    document.getElementById('dash-zone-csv').classList.add('loaded');
+    document.getElementById('dash-csv-icon').textContent='✅';
+    document.getElementById('dash-csv-label').textContent=payPayments.length+' payments loaded';
+  }
+
+  // ── Steps ──
+  const steps=[
+    {
+      id:'invoices',
+      icon: hasInvoices?'✅':'📄',
+      state: hasInvoices?(invoices.some(i=>!i.inApp)&&hasJSON?'partial':'done'):'todo',
+      title:'1. Invoices',
+      desc: hasInvoices
+        ? invCount+' loaded · '+fmt(payInvoices.reduce((s,i)=>s+i.total,0))+' total'+(hasJSON?' · '+(invoices.filter(i=>!i.inApp).length)+' missing from app':'')
+        : 'Upload your invoice PDFs',
+      badge: hasInvoices?invCount+' invoices':'Not loaded',
+    },
+    {
+      id:'payments',
+      icon: !hasInvoices?'⬜':!hasPayCSV?'📊':unpaid.length===0?'✅':'⚠️',
+      state: !hasInvoices||!hasPayCSV?'todo':unpaid.length===0?'done':unpaid.length>0?'alert':'done',
+      title:'2. Payments',
+      desc: !hasPayCSV?'Upload income CSV to match payments'
+        : paid.length+' paid · '+unpaid.length+' unpaid'+(surplus.length>0?' · '+surplus.length+' paid ahead':''),
+      badge: !hasPayCSV?'Not loaded':unpaid.length>0?unpaid.length+' unpaid':'All matched',
+    },
+    {
+      id:'reconcile',
+      icon: !hasJSON?'📋':!hasBankCSV?'📋':'✅',
+      state: !hasJSON||!hasBankCSV?'todo':'done',
+      title:'3. Reconcile',
+      desc: !hasJSON?'Upload reports app JSON backup'
+        :!hasBankCSV?'Load full quarter bank CSV'
+        :'JSON + bank loaded · check totals match',
+      badge: hasJSON&&hasBankCSV?'Ready':'Not loaded',
+    },
+    {
+      id:'bas',
+      icon: basReady?'✅':'📋',
+      state: basReady?'done':'todo',
+      title:'4. BAS Summary',
+      desc: basReady
+        ? 'GST collected '+fmt(incGST/11)+' · Credits '+fmt(expGST/11)+' · Net payable '+fmt(netGST)
+        : 'Load bank CSV to calculate GST',
+      badge: basReady?fmt(netGST)+' payable':'Not ready',
+    },
+  ];
+
+  document.getElementById('dash-steps').innerHTML=steps.map(s=>
+    '<div class="dash-step step-'+s.state+'" onclick="switchTab(\''+s.id+'\')" title="Go to '+s.title+' tab">'+
+    '<div class="dash-step-icon">'+s.icon+'</div>'+
+    '<div class="dash-step-body">'+
+    '<div class="dash-step-title">'+s.title+'</div>'+
+    '<div class="dash-step-desc">'+s.desc+'</div>'+
+    '</div>'+
+    '<div class="dash-step-badge"><span>'+s.badge+' →</span></div>'+
+    '</div>'
+  ).join('');
+
+  // ── Outstanding invoices list ──
+  const outEl=document.getElementById('dash-outstanding');
+  const outBody=document.getElementById('dash-out-body');
+  const outHeader=document.getElementById('dash-out-header');
+  if(hasInvoices&&hasPayCSV){
+    outEl.style.display='';
+    if(unpaid.length===0){
+      outHeader.className='dash-outstanding-header green';
+      outHeader.textContent='✓ All invoices matched — safe to archive paid jobs';
+      outBody.innerHTML='';
+    } else {
+      outHeader.className='dash-outstanding-header';
+      outHeader.innerHTML='✗ Outstanding invoices — <span style="font-weight:normal;font-size:12px">'+unpaid.length+' unpaid · '+fmt(unpaid.reduce((s,m)=>s+m.invoiceTotal,0))+' outstanding</span>';
+      outBody.innerHTML=unpaid.map(m=>
+        '<div class="dash-out-row">'+
+        '<span class="dash-out-rego">'+eh(m.rego)+'</span>'+
+        '<span class="dash-out-vehicle">'+eh(m.vehicle||'—')+'</span>'+
+        '<span class="dash-out-amt">'+fmt(m.invoiceTotal)+'</span>'+
+        '</div>'
+      ).join('');
+    }
+    // Show surplus below if any
+    if(surplus.length>0){
+      const surplusHeader='<div style="padding:8px 16px;background:var(--amber-light);font-size:12px;font-family:\'Courier New\',monospace;color:#7a4a00;border-top:1.5px solid var(--amber)">'+
+        '⚠ '+surplus.length+' payment'+(surplus.length>1?'s':'')+' with no invoice yet (drafts) · '+fmt(surplus.reduce((s,m)=>s+m.received,0))+'</div>';
+      const surplusRows=surplus.map(m=>
+        '<div class="dash-out-row">'+
+        '<span class="dash-out-rego">'+eh(m.rego)+'</span>'+
+        '<span class="dash-out-vehicle" style="color:var(--text-muted)">No invoice uploaded</span>'+
+        '<span style="font-family:\'Courier New\',monospace;font-weight:bold;color:var(--blue)">'+fmt(m.received)+'</span>'+
+        '</div>'
+      ).join('');
+      outBody.innerHTML+=surplusHeader+surplusRows;
+    }
+  } else {
+    outEl.style.display='none';
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -613,7 +830,7 @@ function loadCSV(input,acct){
     zone.querySelector('.uz-icon').textContent='✅';
     document.getElementById(acct+'-label').textContent=file.name+' — '+parsed.length+' txns';
     if(loaded.income||loaded.expense)document.getElementById('btn-proceed').style.display='inline-block';
-    updatePeriod();updateBAS();updateReconcile();updateTax();
+    updatePeriod();updateBAS();updateReconcile();updateTax();updateDashboard();
     toast('✓ Loaded '+parsed.length+' transactions');
     input.value='';
   };
@@ -848,6 +1065,7 @@ async function handleInvoicePDFs(files){
   }
   crossRefInvoices();
   renderInvoiceTable();
+  updateDashboard();
   document.getElementById('inv-file-input').value='';
 }
 
@@ -874,17 +1092,19 @@ async function parseInvoicePDF(file){
   // Extract fields
   const inv={filename:file.name,rego:'',date:'',vehicle:'',total:0,gst:0,hasGST:false,status:'parsed'};
 
-  // Rego from filename first (most reliable): CarGuys_REGO_Make_Model.pdf
-  const fnMatch=file.name.match(/CarGuys_([A-Z0-9]+)_/i)||file.name.match(/([A-Z0-9]{5,8})/i);
+  // Rego from filename FIRST and treat as authoritative
+  // CarGuys_1HDG710_Suzuki_SX4.pdf → 1HDG710
+  const fnMatch=file.name.match(/CarGuys_([A-Z0-9]{4,8})_/i);
   if(fnMatch)inv.rego=fnMatch[1].toUpperCase();
 
-  // Rego from PDF text
-  const regoPatterns=[
-    /REGISTRATION\s*([A-Z0-9]{5,8})/i,
-    /REGO\s*([A-Z0-9]{5,8})/i,
-    /REG(?:ISTRATION)?\s*[:\-]?\s*([A-Z0-9]{5,8})/i,
-  ];
-  for(const re of regoPatterns){const m=fullText.match(re);if(m&&m[1]){inv.rego=m[1].toUpperCase();break;}}
+  // Only scan PDF text for rego if filename didn't give us one
+  if(!inv.rego){
+    const regoPatterns=[
+      /REGISTRATION\s+([A-Z][A-Z0-9]{4,7})\b/i,  // must start with letter to avoid grabbing make names
+      /REGO\s*[:\-]?\s*([A-Z][A-Z0-9]{4,7})\b/i,
+    ];
+    for(const re of regoPatterns){const m=fullText.match(re);if(m&&m[1]){inv.rego=m[1].toUpperCase();break;}}
+  }
 
   // Date
   const datePatterns=[
@@ -905,20 +1125,33 @@ async function parseInvoicePDF(file){
   }
 
   // TOTAL (inc. GST) — find the final total line
-  // Multiple patterns for different layout styles
+  // Also search collapsed text (newlines → space) to catch wrapped table cells
+  const collapsedText=fullText.replace(/\n+/g,' ').replace(/\s{2,}/g,' ');
   const totalPatterns=[
     /TOTAL\s*\(inc\.?\s*GST\)\s*\$?([\d,]+\.\d{2})/i,
     /TOTAL\s*\(inc\s*GST\)\s*\$?([\d,]+\.\d{2})/i,
     /TOTAL\s+\(inc\.?\s*GST\)\s*[\$]?\s*([\d,]+\.\d{2})/i,
+    /TOTAL\s*\(inc\.?\s*\n\s*GST\)\s*\$?\s*([\d,]+\.\d{2})/i,
     /TOTAL.*?\$([\d,]+\.\d{2})\s*$/im,
   ];
+  // Search both full text and collapsed text, take last match
   for(const re of totalPatterns){
-    const matches=[...fullText.matchAll(new RegExp(re.source,re.flags+'g'))];
-    if(matches.length>0){
-      // Take the LAST match — that's the bottom-of-invoice total
-      const last=matches[matches.length-1];
+    const src=re.source;const flags=re.flags.includes('g')?re.flags:re.flags+'g';
+    const m1=[...fullText.matchAll(new RegExp(src,flags))];
+    const m2=[...collapsedText.matchAll(new RegExp(src,flags.replace('m','').replace('g','g')))];
+    const all=[...m1,...m2];
+    if(all.length>0){
+      const last=all[all.length-1];
       inv.total=parseFloat(last[1].replace(/,/g,''));
       break;
+    }
+  }
+  // Last resort — find the largest dollar amount near a TOTAL keyword
+  if(!inv.total){
+    const nearTotal=collapsedText.match(/TOTAL[^$]{0,30}\$([\d,]+\.\d{2})/gi);
+    if(nearTotal&&nearTotal.length){
+      const amounts=nearTotal.map(s=>{const m=s.match(/\$([\d,]+\.\d{2})/);return m?parseFloat(m[1].replace(/,/g,'')):0;});
+      inv.total=Math.max(...amounts);
     }
   }
 
@@ -1093,25 +1326,59 @@ function exportCSV(){
 }
 
 // ═══════════════════════════════════════════════════════
-//  CLEAR
+//  CLEAR — per tab
 // ═══════════════════════════════════════════════════════
-function clearAll(){
-  if(!confirm('Clear all loaded data?'))return;
-  transactions=[];reconJobs=[];loaded={income:false,expense:false};periodStart=null;periodEnd=null;invoices=[];
+let currentTab='dashboard';
+
+function clearCurrentTab(){
+  if(currentTab==='dashboard'||currentTab==='upload'||currentTab==='transactions'||currentTab==='bas'||currentTab==='reconcile'||currentTab==='tax') clearBankData();
+  else if(currentTab==='invoices') clearInvoices();
+  else if(currentTab==='payments') clearPayments();
+}
+
+function clearBankData(){
+  if(!confirm('Clear all loaded bank data?'))return;
+  transactions=[];reconJobs=[];loaded={income:false,expense:false};periodStart=null;periodEnd=null;
   ['income','expense'].forEach(a=>{
     const z=document.getElementById('zone-'+a);z.classList.remove('loaded');
     z.querySelector('.uz-icon').textContent=a==='income'?'📥':'📤';
     document.getElementById(a+'-label').textContent=a==='income'?'Income account':'Expense account';
   });
   document.getElementById('zone-json').classList.remove('loaded');
-  document.getElementById('json-icon').textContent='📋';document.getElementById('json-label').textContent='JW Reports backup';
+  document.getElementById('json-icon').textContent='📋';
+  document.getElementById('json-label').textContent='JW Reports backup';
   document.getElementById('manual-invoiced').value='';
   document.getElementById('btn-proceed').style.display='none';
   ['quarter-display','bas-quarter'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-  document.getElementById('inv-file-list').innerHTML='';document.getElementById('inv-results').style.display='none';
   renderTable();updateBAS();updateReconcile();updateTax();
-  switchTab('upload');toast('Cleared.');
+  toast('Bank data cleared.');
 }
+
+function clearInvoices(){
+  if(!confirm('Clear all uploaded invoices?'))return;
+  invoices=[];
+  document.getElementById('inv-file-list').innerHTML='';
+  document.getElementById('inv-results').style.display='none';
+  toast('Invoices cleared.');
+}
+
+function clearPayments(){
+  if(!confirm('Clear payments tab data?'))return;
+  payInvoices=[];payPayments=[];
+  // Reset upload zones
+  document.getElementById('pay-zone-pdf').classList.remove('loaded');
+  document.getElementById('pay-pdf-icon').textContent='📄';
+  document.getElementById('pay-pdf-label').textContent='Invoice PDFs';
+  document.getElementById('pay-zone-csv').classList.remove('loaded');
+  document.getElementById('pay-csv-icon').textContent='📊';
+  document.getElementById('pay-csv-label').textContent='Income bank CSV';
+  document.getElementById('pay-results').style.display='none';
+  document.getElementById('pay-file-pdf').value='';
+  document.getElementById('pay-file-csv').value='';
+  toast('Payments data cleared.');
+}
+
+function clearAll(){clearBankData();}// legacy — keeps any old references working
 
 // ═══════════════════════════════════════════════════════
 //  PAYMENTS TAB
@@ -1257,6 +1524,7 @@ function matchAndRender(){
   if(!payInvoices.length&&!payPayments.length)return;
   document.getElementById('pay-results').style.display='';
   renderPayTable();
+  updateDashboard();
 }
 
 function renderPayTable(){
@@ -1350,7 +1618,11 @@ function exportPayCSV(){
 }
 
 // Init
-renderTable();updateBAS();updateReconcile();updateTax();
+renderTable();updateBAS();updateReconcile();updateTax();updateDashboard();
+// Hide all tabs except dashboard on load
+['upload','transactions','bas','reconcile','tax','invoices','payments'].forEach(t=>{
+  document.getElementById('tab-'+t).style.display='none';
+});
 </script>
 </body>
 </html>
