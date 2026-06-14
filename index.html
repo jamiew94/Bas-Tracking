@@ -19,12 +19,12 @@ body{font-family:'Georgia',serif;background:var(--grey-bg);color:var(--text);min
 .header-actions{margin-left:auto;display:flex;gap:8px;align-items:center;}
 .btn-header{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:white;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;font-family:inherit;transition:background 0.15s;}
 .btn-header:hover{background:rgba(255,255,255,0.22);}
-.container{max-width:900px;margin:0 auto;padding:20px 16px;}
+.container{max-width:960px;margin:0 auto;padding:20px 16px;}
 .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden;}
 .card-header{background:var(--navy);color:white;padding:12px 18px;font-size:13px;font-weight:bold;letter-spacing:0.8px;text-transform:uppercase;}
 .card-body{padding:18px;}
 .tabs{display:flex;gap:0;border-bottom:2px solid var(--grey-border);margin-bottom:20px;flex-wrap:wrap;}
-.tab{font-size:13px;padding:10px 16px;cursor:pointer;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px;font-family:'Courier New',monospace;letter-spacing:0.3px;transition:color 0.15s;white-space:nowrap;}
+.tab{font-size:12px;padding:10px 14px;cursor:pointer;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px;font-family:'Courier New',monospace;letter-spacing:0.3px;transition:color 0.15s;white-space:nowrap;}
 .tab:hover{color:var(--navy);}
 .tab.active{color:var(--navy);border-bottom-color:var(--amber);font-weight:bold;}
 .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
@@ -48,11 +48,11 @@ table.txn th{background:var(--navy-mid);color:white;padding:8px 10px;text-align:
 table.txn td{padding:7px 10px;border-bottom:1px solid var(--grey-border);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 table.txn tr:nth-child(even) td{background:#fafbfd;}
 table.txn tr:hover td{background:#f0f3fa;}
-table.txn .col-date{width:100px;}
+table.txn .col-date{width:95px;}
 table.txn .col-desc{width:auto;}
 table.txn .col-amt{width:100px;text-align:right;font-family:'Courier New',monospace;}
-table.txn .col-acc{width:60px;text-align:center;}
-table.txn .col-cat{width:190px;}
+table.txn .col-acc{width:55px;text-align:center;}
+table.txn .col-cat{width:185px;}
 .cat-select{width:100%;font-size:12px;padding:4px 6px;border-radius:6px;border:1px solid var(--grey-border);background:white;color:var(--text);font-family:'Courier New',monospace;cursor:pointer;}
 .cat-select:focus{outline:none;border-color:var(--navy-light);}
 .amt-income{color:var(--green);font-weight:bold;}
@@ -61,7 +61,7 @@ table.txn .col-cat{width:190px;}
 .acc-badge{display:inline-block;font-size:10px;padding:2px 5px;border-radius:4px;font-family:'Courier New',monospace;background:var(--grey-bg);color:var(--text-muted);}
 .acc-badge.income{background:var(--blue-light);color:var(--blue);}
 .acc-badge.expense{background:#fff0e8;color:#b84800;}
-.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px;}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:20px;}
 .metric{background:var(--grey-bg);border-radius:8px;padding:14px 16px;border:1px solid var(--grey-border);}
 .metric.highlight{background:var(--navy);border-color:var(--navy);}
 .metric.highlight .m-label{color:rgba(255,255,255,0.6);}
@@ -82,7 +82,8 @@ table.bas td{padding:9px 12px;border-bottom:1px solid var(--grey-border);}
 table.bas tr:nth-child(even) td{background:#fafbfd;}
 table.bas td.right{text-align:right;font-family:'Courier New',monospace;}
 table.bas td.gst{color:var(--blue);font-family:'Courier New',monospace;text-align:right;}
-table.bas td.red{color:var(--red);font-family:'Courier New',monospace;text-align:right;}
+table.bas td.red-t{color:var(--red);font-family:'Courier New',monospace;text-align:right;}
+table.bas td.green-t{color:var(--green);font-family:'Courier New',monospace;text-align:right;}
 table.bas tr.subtotal td{font-weight:bold;border-top:2px solid var(--grey-border);background:var(--grey-bg);}
 table.bas tr.net td{font-weight:bold;font-size:15px;border-top:2px solid var(--navy);background:var(--amber-light);}
 table.bas tr.match td{background:var(--green-light);}
@@ -110,8 +111,6 @@ table.bas tr.timing td{background:var(--amber-light);}
 .field-group label{font-size:11px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);font-family:'Courier New',monospace;}
 .field-group input{border:1.5px solid var(--grey-border);border-radius:7px;padding:10px 12px;font-size:15px;font-family:'Courier New',monospace;color:var(--text);background:white;outline:none;transition:border-color 0.15s;}
 .field-group input:focus{border-color:var(--navy-light);box-shadow:0 0 0 3px rgba(61,90,158,0.10);}
-.tax-bracket-bar{height:12px;border-radius:6px;background:var(--grey-border);overflow:hidden;margin:4px 0 8px;}
-.tax-bracket-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--green),var(--amber),var(--red));transition:width 0.4s;}
 .disclaimer{background:var(--red-light);border:1px solid #f0b8b3;border-radius:8px;padding:12px 14px;font-size:11px;color:#7a2020;font-family:'Courier New',monospace;line-height:1.7;margin-top:14px;}
 .footer-note{font-size:11px;color:var(--text-muted);font-family:'Courier New',monospace;margin-top:12px;line-height:1.6;}
 .jobs-list{margin-top:10px;}
@@ -120,13 +119,41 @@ table.bas tr.timing td{background:var(--amber-light);}
 .job-row .job-meta{color:var(--text-muted);font-family:'Courier New',monospace;font-size:12px;}
 .job-row .job-total{font-family:'Courier New',monospace;font-weight:bold;color:var(--navy);}
 .job-row.outside-period{opacity:0.45;}
+/* ── INVOICE TAB ── */
+.inv-drop{border:2px dashed var(--grey-border);border-radius:var(--radius);padding:30px 20px;text-align:center;cursor:pointer;background:var(--grey-bg);transition:all 0.15s;position:relative;margin-bottom:14px;}
+.inv-drop:hover,.inv-drop.dragover{border-color:var(--navy-light);background:#eef1f8;}
+.inv-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;}
+.inv-drop-icon{font-size:32px;margin-bottom:8px;}
+.inv-drop-title{font-size:14px;font-weight:bold;color:var(--navy);margin-bottom:4px;}
+.inv-drop-sub{font-size:11px;color:var(--text-muted);font-family:'Courier New',monospace;}
+.inv-file-list{margin-bottom:12px;}
+.inv-file-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:7px;margin-bottom:6px;border:1px solid var(--grey-border);background:var(--grey-bg);font-size:13px;}
+.inv-file-item.done{background:var(--green-light);border-color:#a8d5bc;}
+.inv-file-item.error{background:var(--red-light);border-color:#f0b8b3;}
+.inv-file-item.processing{background:var(--amber-light);border-color:#f0c878;}
+.inv-fi-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:bold;color:var(--navy);}
+.inv-fi-status{font-size:11px;color:var(--text-muted);font-family:'Courier New',monospace;flex-shrink:0;}
+table.inv{width:100%;border-collapse:collapse;font-size:13px;}
+table.inv th{background:var(--navy-mid);color:white;padding:8px 10px;text-align:left;font-size:11px;letter-spacing:0.5px;font-family:'Courier New',monospace;}
+table.inv th.right{text-align:right;}
+table.inv td{padding:8px 10px;border-bottom:1px solid var(--grey-border);vertical-align:middle;}
+table.inv tr:nth-child(even) td{background:#fafbfd;}
+table.inv tr:hover td{background:#f0f3fa;}
+table.inv td.right{text-align:right;font-family:'Courier New',monospace;}
+table.inv td.mono{font-family:'Courier New',monospace;}
+.status-pill{display:inline-block;font-size:11px;padding:3px 8px;border-radius:100px;font-weight:bold;font-family:'Courier New',monospace;white-space:nowrap;}
+.pill-found{background:var(--green-light);color:var(--green);}
+.pill-missing{background:var(--red-light);color:var(--red);}
+.pill-nogst{background:var(--blue-light);color:var(--blue);}
+.pill-processing{background:var(--amber-light);color:#7a4a00;}
+.pill-error{background:var(--grey-bg);color:var(--text-muted);}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-family:'Courier New',monospace;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;}
 @media(max-width:600px){
   .upload-grid{grid-template-columns:1fr;}
   .metrics-grid{grid-template-columns:1fr 1fr;}
   .field-row{grid-template-columns:1fr;}
   table.txn .col-desc{max-width:120px;}
-  .tab{padding:8px 10px;font-size:12px;}
+  .tab{padding:8px 8px;font-size:11px;}
 }
 </style>
 </head>
@@ -150,6 +177,7 @@ table.bas tr.timing td{background:var(--amber-light);}
     <div class="tab" onclick="switchTab('bas')" id="tab-btn-bas">BAS Summary</div>
     <div class="tab" onclick="switchTab('reconcile')" id="tab-btn-reconcile">Reconcile</div>
     <div class="tab" onclick="switchTab('tax')" id="tab-btn-tax">Tax Estimate</div>
+    <div class="tab" onclick="switchTab('invoices')" id="tab-btn-invoices">Invoices</div>
   </div>
 
   <!-- ═══ UPLOAD ═══ -->
@@ -179,9 +207,8 @@ table.bas tr.timing td{background:var(--amber-light);}
           <strong>How to export from HSBC Online Banking</strong>
           Log in → My Accounts → select account → Transactions → Download Transactions → choose date range → Common Spreadsheets (Comma Delimited Format) → Download.<br><br>
           <strong>Category rules applied automatically</strong><br>
-          Income account: Melissa Farquhar transfers = Business income (inc. GST) · Bank interest = Non-GST income · Transfers out = Excluded<br>
-          Expense account: Salary/drawings to NAB = Excluded · 2% cashbacks = Excluded · Everything else = Business expense (inc. GST)<br>
-          Override any transaction on the Transactions tab.
+          Income: Melissa Farquhar transfers = Business income (GST) · Interest = Non-GST income · Transfers = Excluded<br>
+          Expenses: Salary/drawings = Excluded · Cashbacks = Excluded · Everything else = Business expense (GST)
         </div>
       </div>
     </div>
@@ -247,7 +274,7 @@ table.bas tr.timing td{background:var(--amber-light);}
           <button class="btn btn-green" onclick="exportCSV()">↓ Export categorised CSV</button>
           <button class="btn btn-amber" onclick="window.print()">🖨 Print BAS summary</button>
         </div>
-        <div class="footer-note">GST calculated as 1/11 of GST-inclusive amounts. Bank interest carries no GST.<br>Verify all figures with your registered tax agent or accountant before lodging.<br>BAS lodgement due: 28 days after quarter end.</div>
+        <div class="footer-note">GST calculated as 1/11 of GST-inclusive amounts. Bank interest carries no GST.<br>Verify all figures with your registered tax agent before lodging. BAS due 28 days after quarter end.</div>
       </div>
     </div>
   </div>
@@ -257,8 +284,7 @@ table.bas tr.timing td{background:var(--amber-light);}
     <div class="card">
       <div class="card-header">Reconcile — Reports App vs Bank</div>
       <div class="card-body">
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Cross-check your invoiced totals from the reports app against what actually landed in your bank. Upload your JW Reports backup JSON, or enter a total manually.</p>
-
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Cross-check invoiced totals from the reports app against what actually landed in your bank.</p>
         <div class="upload-grid">
           <div class="upload-zone" id="zone-json" onclick="document.getElementById('file-json').click()">
             <div class="uz-icon" id="json-icon">📋</div>
@@ -271,20 +297,18 @@ table.bas tr.timing td{background:var(--amber-light);}
               <label>Or enter invoiced total manually (inc. GST)</label>
               <input type="number" id="manual-invoiced" placeholder="e.g. 8417.80" step="0.01" oninput="updateReconcile()">
             </div>
-            <p style="font-size:11px;color:var(--text-muted);font-family:'Courier New',monospace;">Manual total is used only if no JSON is loaded.</p>
+            <p style="font-size:11px;color:var(--text-muted);font-family:'Courier New',monospace;">Manual total used only if no JSON is loaded.</p>
           </div>
         </div>
-
-        <div id="recon-status" class="recon-status recon-empty">Load bank CSVs and either upload a JSON backup or enter a total to reconcile.</div>
-
+        <div id="recon-status" class="recon-status recon-empty">Load bank CSVs and upload a JSON backup or enter a total to reconcile.</div>
         <div id="recon-detail" style="display:none">
           <div class="section-title">Comparison</div>
           <table class="bas" id="recon-table"></table>
           <div class="section-title" id="jobs-section-title" style="display:none">Jobs in period (from reports app)</div>
           <div class="jobs-list" id="jobs-list"></div>
-          <div id="recon-timing-note" style="display:none" class="howto" style="margin-top:12px;">
+          <div id="recon-timing-note" style="display:none" class="howto">
             <strong>About timing differences</strong>
-            A difference between invoiced and received is normal — invoices sent near quarter end may be paid in the next period. If the difference matches a known unpaid invoice, that explains it.
+            A difference is normal — invoices sent near quarter end may be paid next period. If the difference matches a known unpaid invoice, that explains it.
           </div>
         </div>
       </div>
@@ -296,8 +320,7 @@ table.bas tr.timing td{background:var(--amber-light);}
     <div class="card">
       <div class="card-header">Income Tax Estimate (FY2025–26)</div>
       <div class="card-body">
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Based on your loaded BAS data. Adjust the fields below as needed.</p>
-
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Based on your loaded BAS data. Adjust fields as needed.</p>
         <div class="field-row">
           <div class="field-group">
             <label>Periods per year (quarters loaded)</label>
@@ -308,66 +331,147 @@ table.bas tr.timing td{background:var(--amber-light);}
             <input type="number" id="tax-other" value="0" min="0" step="100" placeholder="0" oninput="updateTax()">
           </div>
         </div>
-
         <div class="metrics-grid" id="tax-metrics"></div>
-
         <div class="section-title">Tax breakdown</div>
         <table class="bas" id="tax-table"></table>
-
         <div class="section-title">What to set aside</div>
         <table class="bas" id="tax-setaside"></table>
+        <div class="disclaimer">⚠ ESTIMATE ONLY — not tax advice.<br>Not accounted for: LITO, super, depreciation, private health, Medicare exemptions, prior losses, or other offsets.<br>Speak to a registered tax agent before lodging.</div>
+      </div>
+    </div>
+  </div>
 
-        <div class="disclaimer">
-          ⚠ ESTIMATE ONLY — this is a rough guide, not tax advice.<br>
-          Not accounted for: low income tax offset (LITO), low &amp; middle income offset (LMITO), super contributions, depreciation, private health rebate, Medicare exemptions, prior year losses, or any other offsets or deductions.<br>
-          Speak to a registered tax agent before lodging your return.
+  <!-- ═══ INVOICES ═══ -->
+  <div id="tab-invoices" style="display:none">
+    <div class="card">
+      <div class="card-header">Invoice Reconciliation</div>
+      <div class="card-body">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Upload your saved invoice PDFs. The tool extracts each invoice total and cross-references against your reports app JSON backup. Identifies what's in the system vs missing.</p>
+        <div class="inv-drop" id="inv-drop-zone">
+          <input type="file" id="inv-file-input" accept=".pdf" multiple onchange="handleInvoicePDFs(this.files)">
+          <div class="inv-drop-icon">📄</div>
+          <div class="inv-drop-title">Drop invoice PDFs here or click to browse</div>
+          <div class="inv-drop-sub">CarGuys_REGO_Make_Model.pdf · Multiple files supported · Processing in your browser</div>
+        </div>
+        <div class="inv-file-list" id="inv-file-list"></div>
+        <div id="inv-results" style="display:none">
+          <div class="metrics-grid" id="inv-metrics"></div>
+          <div class="section-title">Invoice register</div>
+          <div class="toolbar">
+            <select id="inv-filter" onchange="renderInvoiceTable()">
+              <option value="all">All invoices</option>
+              <option value="found">✓ In reports app</option>
+              <option value="missing">✗ Missing from app</option>
+              <option value="nogst">No GST</option>
+            </select>
+            <span class="txn-counter" id="inv-count"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="inv">
+              <thead><tr>
+                <th style="width:95px">Date</th>
+                <th style="width:100px">Rego</th>
+                <th>Vehicle</th>
+                <th class="right" style="width:110px">Total (inc. GST)</th>
+                <th class="right" style="width:80px">GST</th>
+                <th style="width:110px;text-align:center">In App</th>
+              </tr></thead>
+              <tbody id="inv-body"></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="inv-empty" style="display:none">No invoices match the current filter.</div>
+          <div class="action-row">
+            <button class="btn btn-navy" onclick="exportMissingJSON()" id="btn-export-missing" style="display:none">↓ Export missing jobs JSON</button>
+            <button class="btn btn-green" onclick="exportInvoiceCSV()">↓ Export invoice register CSV</button>
+          </div>
+          <div class="howto" style="margin-top:14px;">
+            <strong>Export missing jobs JSON</strong>
+            Downloads a JSON file of invoices not found in the reports app. You can import this into the reports app to restore missing records. The JSON includes: rego, date, vehicle, invoice total, GST flag — enough to restore the financial record. Inspection data is not recoverable from the PDF alone.
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
+</div>
 <div id="toast"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-// ═══════════════════════════════════════════
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ═══════════════════════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════
-let transactions = [];
-let loaded = { income: false, expense: false };
-let reconJobs = [];
-let periodStart = null, periodEnd = null;
+// ═══════════════════════════════════════════════════════
+let transactions=[];
+let loaded={income:false,expense:false};
+let reconJobs=[];
+let periodStart=null,periodEnd=null;
+let invoices=[];
 
-const CATS = [
-  { value:'income',       label:'Business income (GST)' },
-  { value:'income-nogst', label:'Non-GST income' },
-  { value:'expense',      label:'Business expense (GST)' },
-  { value:'drawings',     label:'Drawings (excluded)' },
-  { value:'excluded',     label:'Excluded' },
-  { value:'review',       label:'⚠ Needs review' },
+const CATS=[
+  {value:'income',label:'Business income (GST)'},
+  {value:'income-nogst',label:'Non-GST income'},
+  {value:'expense',label:'Business expense (GST)'},
+  {value:'drawings',label:'Drawings (excluded)'},
+  {value:'excluded',label:'Excluded'},
+  {value:'review',label:'⚠ Needs review'},
 ];
 
-// ATO FY2025-26 individual tax brackets
-const TAX_BRACKETS = [
-  { min:0,      max:18200,  rate:0,    base:0 },
-  { min:18201,  max:45000,  rate:0.19, base:0 },
-  { min:45001,  max:120000, rate:0.325,base:5092 },
-  { min:120001, max:180000, rate:0.37, base:29467 },
-  { min:180001, max:Infinity,rate:0.45,base:51667 },
+const TAX_BRACKETS=[
+  {min:0,max:18200,rate:0,base:0},
+  {min:18201,max:45000,rate:0.19,base:0},
+  {min:45001,max:120000,rate:0.325,base:5092},
+  {min:120001,max:180000,rate:0.37,base:29467},
+  {min:180001,max:Infinity,rate:0.45,base:51667},
 ];
-const MEDICARE = 0.02;
-const LITO_MAX = 700; // Low income tax offset FY26
 
-// ═══════════════════════════════════════════
-//  CSV PARSING
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function eh(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmt(n){return'$'+Math.abs(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtAmt(n){return(n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function parseDateSort(s){
+  const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const m=s.trim().match(/(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})/);
+  return m?new Date(parseInt(m[3]),months[m[2]]||0,parseInt(m[1])).getTime():0;
+}
+function parseDateSortDMY(s){
+  if(!s)return 0;
+  const p=s.split('/');
+  return p.length===3?new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0])).getTime():0;
+}
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.style.opacity='1';
+  clearTimeout(window._tt);window._tt=setTimeout(()=>{el.style.opacity='0';},2600);
+}
+
+// ═══════════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════════
+function switchTab(name){
+  ['upload','transactions','bas','reconcile','tax','invoices'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===name?'':'none';
+    document.getElementById('tab-btn-'+t).classList.toggle('active',t===name);
+  });
+  if(name==='transactions')renderTable();
+  if(name==='bas')updateBAS();
+  if(name==='reconcile')updateReconcile();
+  if(name==='tax')updateTax();
+  if(name==='invoices')renderInvoiceTable();
+}
+
+// ═══════════════════════════════════════════════════════
+//  CSV PARSING (bank statements)
+// ═══════════════════════════════════════════════════════
 function splitCSVLine(line){
   const r=[];let inQ=false,cur='';
   for(let c of line){if(c==='"'){inQ=!inQ;}else if(c===','&&!inQ){r.push(cur);cur='';}else cur+=c;}
   r.push(cur);return r;
 }
-
-function parseCSV(text, acct){
+function parseCSV(text,acct){
   const lines=text.split('\n').filter(l=>l.trim());
   const rows=[];
   for(let i=1;i<lines.length;i++){
@@ -381,18 +485,6 @@ function parseCSV(text, acct){
   }
   return rows;
 }
-
-function parseDateSort(s){
-  const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  const p=s.trim().split(' ');
-  return p.length===3?new Date(parseInt(p[2]),months[p[1]]||0,parseInt(p[0])).getTime():0;
-}
-
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
-
-// ═══════════════════════════════════════════
-//  AUTO-CATEGORISATION
-// ═══════════════════════════════════════════
 function autoCategory(desc,amt,acct){
   const d=desc.toUpperCase();
   if(acct==='income'){
@@ -408,8 +500,8 @@ function autoCategory(desc,amt,acct){
     if(d.includes('SALARY')||d.includes('SLARARY')||d.includes('BTC INVEST'))return'drawings';
     if((d.includes('TRANSFER RTP')||d.includes('TRANSFER TO'))&&amt<0)return'drawings';
     if(amt>0)return'excluded';
-    if(d.includes('CALTEX')||d.includes('PETRO FUELS')||d.includes('BP ')||d.includes('AMPOL')||d.includes('SHELL '))return'expense';
-    if(d.includes('VEALE AUTO')||d.includes('FIVE50')||d.includes('JEEP SPARES')||d.includes('SMP')||d.includes('BURK BASSENDEAN')||d.includes('AUTO PARTS')||d.includes('REPCO')||d.includes('SUPERCHEAP')||d.includes('AUTOPRO'))return'expense';
+    if(d.includes('CALTEX')||d.includes('PETRO FUELS')||d.includes('BP ')||d.includes('AMPOL'))return'expense';
+    if(d.includes('VEALE AUTO')||d.includes('FIVE50')||d.includes('JEEP SPARES')||d.includes('SMP')||d.includes('BURK BASSENDEAN')||d.includes('AUTO PARTS')||d.includes('REPCO')||d.includes('SUPERCHEAP'))return'expense';
     if(d.includes('BUNNINGS')||d.includes('TOTAL TOOLS')||d.includes('SYDNEY TOOLS'))return'expense';
     if(d.includes('TRANSPORT WA')||d.includes('LICENSING'))return'expense';
     if(d.includes('EBAY')||d.includes('PAYPAL'))return'expense';
@@ -418,10 +510,6 @@ function autoCategory(desc,amt,acct){
   }
   return'review';
 }
-
-// ═══════════════════════════════════════════
-//  LOAD CSV
-// ═══════════════════════════════════════════
 function loadCSV(input,acct){
   const file=input.files[0];if(!file)return;
   const reader=new FileReader();
@@ -435,92 +523,24 @@ function loadCSV(input,acct){
     zone.querySelector('.uz-icon').textContent='✅';
     document.getElementById(acct+'-label').textContent=file.name+' — '+parsed.length+' txns';
     if(loaded.income||loaded.expense)document.getElementById('btn-proceed').style.display='inline-block';
-    updatePeriod();
-    updateAll();
+    updatePeriod();updateBAS();updateReconcile();updateTax();
     toast('✓ Loaded '+parsed.length+' transactions');
     input.value='';
   };
   reader.readAsText(file);
 }
-
-// ═══════════════════════════════════════════
-//  LOAD JSON (reports app backup)
-// ═══════════════════════════════════════════
-function loadJSON(input){
-  const file=input.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    try{
-      const data=JSON.parse(e.target.result);
-      if(!data.jobs)throw new Error('No jobs found');
-      // Deduplicate by jobId, fall back to rego+date+total
-      const seen=new Set();
-      reconJobs=[];
-      for(const j of data.jobs){
-        const key=j.jobId||(j.rego+'|'+j.date+'|'+j.invoiceTotal);
-        if(seen.has(key))continue;
-        seen.add(key);
-        reconJobs.push({
-          date:j.date,
-          dateSort:parseDateSortDMY(j.date),
-          rego:j.rego||'—',
-          customerType:j.customerType||'',
-          custName:j.custName||'',
-          invoiceTotal:parseFloat(j.invoiceTotal)||0,
-          jobId:j.jobId||key
-        });
-      }
-      reconJobs.sort((a,b)=>b.dateSort-a.dateSort);
-      document.getElementById('zone-json').classList.add('loaded');
-      document.getElementById('json-icon').textContent='✅';
-      document.getElementById('json-label').textContent=file.name+' — '+reconJobs.length+' jobs';
-      document.getElementById('manual-invoiced').value='';
-      updateReconcile();
-      toast('✓ Loaded '+reconJobs.length+' unique jobs');
-    }catch(err){toast('Error reading JSON: '+err.message);}
-    input.value='';
-  };
-  reader.readAsText(file);
-}
-
-function parseDateSortDMY(s){
-  if(!s)return 0;
-  const p=s.split('/');
-  return p.length===3?new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0])).getTime():0;
-}
-
-// ═══════════════════════════════════════════
-//  PERIOD
-// ═══════════════════════════════════════════
 function updatePeriod(){
   if(!transactions.length)return;
   const dates=transactions.filter(t=>t.dateSort>0).map(t=>t.dateSort);
-  periodStart=Math.min(...dates);
-  periodEnd=Math.max(...dates);
-  const fmt=d=>new Date(d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
-  const msg='Period: '+fmt(periodStart)+' → '+fmt(periodEnd);
+  periodStart=Math.min(...dates);periodEnd=Math.max(...dates);
+  const fmt2=d=>new Date(d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+  const msg='Period: '+fmt2(periodStart)+' → '+fmt2(periodEnd);
   ['quarter-display','bas-quarter'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=msg;el.style.display='';}});
 }
 
-// ═══════════════════════════════════════════
-//  TABS
-// ═══════════════════════════════════════════
-function switchTab(name){
-  ['upload','transactions','bas','reconcile','tax'].forEach(t=>{
-    document.getElementById('tab-'+t).style.display=t===name?'':'none';
-    document.getElementById('tab-btn-'+t).classList.toggle('active',t===name);
-  });
-  if(name==='transactions')renderTable();
-  if(name==='bas')updateBAS();
-  if(name==='reconcile')updateReconcile();
-  if(name==='tax')updateTax();
-}
-
-function updateAll(){renderTable();updateBAS();updateReconcile();updateTax();}
-
-// ═══════════════════════════════════════════
-//  TRANSACTIONS TABLE
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  TRANSACTION TABLE
+// ═══════════════════════════════════════════════════════
 function renderTable(){
   const fc=document.getElementById('filter-cat').value;
   const fa=document.getElementById('filter-account').value;
@@ -532,8 +552,7 @@ function renderTable(){
   document.getElementById('txn-count').textContent=rows.length+' transaction'+(rows.length!==1?'s':'');
   const rc=transactions.filter(t=>t.category==='review').length;
   const banner=document.getElementById('review-banner');
-  if(rc>0){banner.style.display='';document.getElementById('review-count').textContent=rc;}
-  else banner.style.display='none';
+  if(rc>0){banner.style.display='';document.getElementById('review-count').textContent=rc;}else banner.style.display='none';
   if(!transactions.length){tbody.innerHTML='';empty.style.display='';return;}
   empty.style.display='none';
   tbody.innerHTML=rows.map(t=>{
@@ -550,27 +569,32 @@ function renderTable(){
       '<td class="col-cat"><select class="cat-select" onchange="setCat(\''+t.id+'\',this.value)">'+opts+'</select></td></tr>';
   }).join('');
 }
-
 function setCat(id,val){const t=transactions.find(t=>t.id===id);if(t){t.category=val;updateBAS();updateReconcile();updateTax();}}
-function eh(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ═══════════════════════════════════════════
-//  BAS CALCULATIONS
-// ═══════════════════════════════════════════
-function fmtAmt(n){return(n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function fmt(n){return'$'+Math.abs(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});}
-
+// ═══════════════════════════════════════════════════════
+//  BAS
+// ═══════════════════════════════════════════════════════
 function calcBAS(){
   const incGST=transactions.filter(t=>t.category==='income'&&t.amount>0).reduce((s,t)=>s+t.amount,0);
   const incNoGST=transactions.filter(t=>t.category==='income-nogst'&&t.amount>0).reduce((s,t)=>s+t.amount,0);
   const expGST=transactions.filter(t=>t.category==='expense'&&t.amount<0).reduce((s,t)=>s+Math.abs(t.amount),0);
   return{incGST,incNoGST,expGST,gstCollected:incGST/11,gstPaid:expGST/11,netGST:incGST/11-expGST/11};
 }
-
+function cleanVendor(desc){
+  const d=desc.toUpperCase();
+  if(d.includes('CALTEX'))return'Caltex Bayswater';if(d.includes('PETRO FUELS'))return'Petro Fuels Westminster';
+  if(d.includes('FIVE50'))return'Five50 Auto Parts';if(d.includes('VEALE AUTO'))return'Veale Auto Parts';
+  if(d.includes('JEEP SPARES')||(d.includes('SMP')&&d.includes('SPARES')))return'SMP Jeep Spares';
+  if(d.includes('BURK BASSENDEAN'))return'Burk Bassendean';if(d.includes('BUNNINGS'))return'Bunnings';
+  if(d.includes('TRANSPORT WA'))return'Transport WA Perth';if(d.includes('EBAY')||d.includes('PAYPAL'))return'eBay / PayPal';
+  if(d.includes('AMAZON'))return'Amazon';if(d.includes('REPCO'))return'Repco';
+  if(d.includes('SUPERCHEAP')||d.includes('SUPER CHEAP'))return'Supercheap Auto';
+  if(d.includes('TOTAL TOOLS'))return'Total Tools';if(d.includes('BOC GAS'))return'BOC Gas';
+  return desc.replace(/\d{2}[A-Z]{3}\d{2,4}.*/,'').replace(/ATMA\d+.*/i,'').replace(/[0-9]{6,}.*/,'').trim().slice(0,35)||desc.slice(0,35);
+}
 function updateBAS(){
   const {incGST,incNoGST,expGST,gstCollected,gstPaid,netGST}=calcBAS();
   const incExGST=incGST-gstCollected,expExGST=expGST-gstPaid;
-
   document.getElementById('bas-metrics').innerHTML=[
     {label:'Total income (inc. GST)',val:fmt(incGST+incNoGST),cls:''},
     {label:'GST collected',val:fmt(gstCollected),cls:''},
@@ -579,222 +603,392 @@ function updateBAS(){
     {label:'Net GST payable',val:fmt(netGST),cls:netGST>=0?'red':'green'},
     {label:'Transactions',val:transactions.length,cls:'highlight'},
   ].map(m=>'<div class="metric '+m.cls+'"><div class="m-label">'+m.label+'</div><div class="m-val">'+m.val+'</div></div>').join('');
-
   document.getElementById('bas-gst-table').innerHTML=
     '<thead><tr><th>Item</th><th class="right">Inc. GST</th><th class="right">GST (1/11)</th><th class="right">Ex. GST</th></tr></thead><tbody>'+
     '<tr><td>Business income (taxable)</td><td class="right">'+fmt(incGST)+'</td><td class="gst">'+fmt(gstCollected)+'</td><td class="right">'+fmt(incExGST)+'</td></tr>'+
     '<tr><td>Non-GST income (bank interest)</td><td class="right">'+fmt(incNoGST)+'</td><td class="right" style="color:var(--text-muted)">—</td><td class="right">'+fmt(incNoGST)+'</td></tr>'+
     '<tr class="subtotal"><td>Total income</td><td class="right">'+fmt(incGST+incNoGST)+'</td><td class="gst">'+fmt(gstCollected)+'</td><td class="right">'+fmt(incExGST+incNoGST)+'</td></tr>'+
     '<tr><td>Business expenses</td><td class="right">'+fmt(expGST)+'</td><td class="gst">'+fmt(gstPaid)+'</td><td class="right">'+fmt(expExGST)+'</td></tr>'+
-    '<tr class="net"><td><strong>Net GST payable / (refund)</strong></td><td></td><td class="right" style="color:'+(netGST>=0?'var(--red)':'var(--green)')+'"><strong>'+(netGST<0?'('+fmt(netGST)+' refund)':fmt(netGST))+'</strong></td><td></td></tr>'+
-    '</tbody>';
-
+    '<tr class="net"><td><strong>Net GST payable / (refund)</strong></td><td></td><td class="right" style="color:'+(netGST>=0?'var(--red)':'var(--green)')+'"><strong>'+(netGST<0?'('+fmt(netGST)+' refund)':fmt(netGST))+'</strong></td><td></td></tr></tbody>';
   const payerMap={};
-  transactions.filter(t=>t.category==='income'&&t.amount>0).forEach(t=>{
-    const k='The Car Guys (via Melissa Farquhar)';
-    payerMap[k]=(payerMap[k]||0)+t.amount;
-  });
+  transactions.filter(t=>t.category==='income'&&t.amount>0).forEach(t=>{const k='The Car Guys (via Melissa Farquhar)';payerMap[k]=(payerMap[k]||0)+t.amount;});
   let incRows=Object.entries(payerMap).map(([k,v])=>'<tr><td>'+k+'</td><td class="right">'+fmt(v)+'</td><td class="gst">'+fmt(v/11)+'</td><td class="right">'+fmt(v-v/11)+'</td></tr>').join('');
   if(incNoGST>0)incRows+='<tr><td>Bank interest (no GST)</td><td class="right">'+fmt(incNoGST)+'</td><td class="right" style="color:var(--text-muted)">—</td><td class="right">'+fmt(incNoGST)+'</td></tr>';
-  document.getElementById('bas-income-table').innerHTML=
-    '<thead><tr><th>Source</th><th class="right">Inc. GST</th><th class="right">GST</th><th class="right">Ex. GST</th></tr></thead><tbody>'+
-    (incRows||'<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px;">No income loaded</td></tr>')+'</tbody>';
-
+  document.getElementById('bas-income-table').innerHTML='<thead><tr><th>Source</th><th class="right">Inc. GST</th><th class="right">GST</th><th class="right">Ex. GST</th></tr></thead><tbody>'+(incRows||'<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px">No income loaded</td></tr>')+'</tbody>';
   const vmap={};
-  transactions.filter(t=>t.category==='expense'&&t.amount<0).forEach(t=>{
-    const k=cleanVendor(t.desc);vmap[k]=(vmap[k]||0)+Math.abs(t.amount);
-  });
+  transactions.filter(t=>t.category==='expense'&&t.amount<0).forEach(t=>{const k=cleanVendor(t.desc);vmap[k]=(vmap[k]||0)+Math.abs(t.amount);});
   const sv=Object.entries(vmap).sort((a,b)=>b[1]-a[1]);
   let expRows=sv.map(([k,v])=>'<tr><td>'+eh(k)+'</td><td class="right">'+fmt(v)+'</td><td class="gst">'+fmt(v/11)+'</td><td class="right">'+fmt(v-v/11)+'</td></tr>').join('');
   const et=sv.reduce((s,[,v])=>s+v,0);
   if(et>0)expRows+='<tr class="subtotal"><td>Total</td><td class="right">'+fmt(et)+'</td><td class="gst">'+fmt(et/11)+'</td><td class="right">'+fmt(et-et/11)+'</td></tr>';
-  document.getElementById('bas-expense-table').innerHTML=
-    '<thead><tr><th>Vendor</th><th class="right">Inc. GST</th><th class="right">GST credit</th><th class="right">Ex. GST</th></tr></thead><tbody>'+
-    (expRows||'<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px;">No expenses loaded</td></tr>')+'</tbody>';
+  document.getElementById('bas-expense-table').innerHTML='<thead><tr><th>Vendor</th><th class="right">Inc. GST</th><th class="right">GST credit</th><th class="right">Ex. GST</th></tr></thead><tbody>'+(expRows||'<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px">No expenses loaded</td></tr>')+'</tbody>';
 }
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  RECONCILE
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+function loadJSON(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data.jobs)throw new Error('No jobs found');
+      const seen=new Set();reconJobs=[];
+      for(const j of data.jobs){
+        const key=j.jobId||(j.rego+'|'+j.date+'|'+j.invoiceTotal);
+        if(seen.has(key))continue;seen.add(key);
+        reconJobs.push({date:j.date,dateSort:parseDateSortDMY(j.date),rego:j.rego||'—',customerType:j.customerType||'',custName:j.custName||'',invoiceTotal:parseFloat(j.invoiceTotal)||0,jobId:j.jobId||key});
+      }
+      reconJobs.sort((a,b)=>b.dateSort-a.dateSort);
+      document.getElementById('zone-json').classList.add('loaded');
+      document.getElementById('json-icon').textContent='✅';
+      document.getElementById('json-label').textContent=file.name+' — '+reconJobs.length+' jobs';
+      document.getElementById('manual-invoiced').value='';
+      updateReconcile();crossRefInvoices();
+      toast('✓ Loaded '+reconJobs.length+' unique jobs');
+    }catch(err){toast('Error reading JSON: '+err.message);}
+    input.value='';
+  };
+  reader.readAsText(file);
+}
 function updateReconcile(){
-  const {incGST}=calcBAS();
-  const bankTotal=incGST;
-
-  // Determine invoiced total source
-  let invoicedTotal=0;
-  let source='none';
-
+  const{incGST}=calcBAS();const bankTotal=incGST;
+  let invoicedTotal=0,source='none';
   if(reconJobs.length>0){
-    // Filter jobs within period if we have bank data
-    const jobsInPeriod=periodStart&&periodEnd
-      ? reconJobs.filter(j=>j.dateSort>=periodStart-86400000*3&&j.dateSort<=periodEnd+86400000*3)
-      : reconJobs;
-    invoicedTotal=jobsInPeriod.reduce((s,j)=>s+j.invoiceTotal,0);
-    source='json';
-
-    // Render jobs list
+    const jobsInPeriod=periodStart&&periodEnd?reconJobs.filter(j=>j.dateSort>=periodStart-86400000*3&&j.dateSort<=periodEnd+86400000*3):reconJobs;
+    invoicedTotal=jobsInPeriod.reduce((s,j)=>s+j.invoiceTotal,0);source='json';
     document.getElementById('jobs-section-title').style.display='';
-    const allJobs=reconJobs.map(j=>{
-      const inPeriod=!periodStart||!periodEnd||(j.dateSort>=periodStart-86400000*3&&j.dateSort<=periodEnd+86400000*3);
-      return'<div class="job-row'+(inPeriod?'':' outside-period')+'">'+
-        '<span>'+j.date+' · <strong>'+eh(j.rego)+'</strong>'+(j.custName?' · '+eh(j.custName):'')+'</span>'+
-        '<span class="job-total">'+fmt(j.invoiceTotal)+'</span></div>';
+    const allJobsHtml=reconJobs.map(j=>{
+      const inP=!periodStart||!periodEnd||(j.dateSort>=periodStart-86400000*3&&j.dateSort<=periodEnd+86400000*3);
+      return'<div class="job-row'+(inP?'':' outside-period')+'"><span>'+j.date+' · <strong>'+eh(j.rego)+'</strong>'+(j.custName?' · '+eh(j.custName):'')+'</span><span class="job-total">'+fmt(j.invoiceTotal)+'</span></div>';
     }).join('');
-    document.getElementById('jobs-list').innerHTML=allJobs+
-      '<div class="job-row subtotal" style="border-top:2px solid var(--grey-border);font-family:\'Courier New\',monospace">'+
-      '<span>Jobs in period ('+jobsInPeriod.length+')</span><span class="job-total">'+fmt(invoicedTotal)+'</span></div>'+
-      (reconJobs.length>jobsInPeriod.length?'<p style="font-size:11px;color:var(--text-muted);padding:8px 12px;font-family:\'Courier New\',monospace;">'+
-      (reconJobs.length-jobsInPeriod.length)+' job(s) outside the bank statement period are greyed out.</p>':'');
-  } else {
+    document.getElementById('jobs-list').innerHTML=allJobsHtml+
+      '<div class="job-row subtotal" style="border-top:2px solid var(--grey-border);font-family:\'Courier New\',monospace"><span>Jobs in period ('+jobsInPeriod.length+')</span><span class="job-total">'+fmt(invoicedTotal)+'</span></div>';
+  }else{
     const manual=parseFloat(document.getElementById('manual-invoiced').value)||0;
     if(manual>0){invoicedTotal=manual;source='manual';}
-    document.getElementById('jobs-section-title').style.display='none';
-    document.getElementById('jobs-list').innerHTML='';
+    document.getElementById('jobs-section-title').style.display='none';document.getElementById('jobs-list').innerHTML='';
   }
-
-  const statusEl=document.getElementById('recon-status');
-  const detailEl=document.getElementById('recon-detail');
-
-  if(source==='none'||bankTotal===0){
-    statusEl.className='recon-status recon-empty';
-    statusEl.textContent='Load bank CSVs and upload a JSON backup (or enter a manual total) to reconcile.';
-    detailEl.style.display='none';
-    return;
-  }
-
+  const statusEl=document.getElementById('recon-status');const detailEl=document.getElementById('recon-detail');
+  if(source==='none'||bankTotal===0){statusEl.className='recon-status recon-empty';statusEl.textContent='Load bank CSVs and upload a JSON backup (or enter a manual total) to reconcile.';detailEl.style.display='none';return;}
   detailEl.style.display='';
-  const diff=invoicedTotal-bankTotal;
-  const diffAbs=Math.abs(diff);
-  const tolerance=0.10;
-
-  let statusClass,statusMsg;
-  if(diffAbs<=tolerance){
-    statusClass='recon-ok';statusMsg='✓ Balanced — invoiced and received amounts match.';
-  } else if(diff>0){
-    statusClass='recon-timing';statusMsg='⚠ '+fmt(diffAbs)+' invoiced but not yet received — likely a timing difference (invoice paid next period).';
-    document.getElementById('recon-timing-note').style.display='';
-  } else {
-    statusClass='recon-diff';statusMsg='✗ Bank received '+fmt(diffAbs)+' more than invoiced — check for uninvoiced payments or duplicate entries.';
-    document.getElementById('recon-timing-note').style.display='none';
-  }
-  statusEl.className='recon-status '+statusClass;
-  statusEl.textContent=statusMsg;
-
+  const diff=invoicedTotal-bankTotal;const diffAbs=Math.abs(diff);
+  let sc,sm;
+  if(diffAbs<=0.10){sc='recon-ok';sm='✓ Balanced — invoiced and received amounts match.';}
+  else if(diff>0){sc='recon-timing';sm='⚠ '+fmt(diffAbs)+' invoiced but not yet received — likely a timing difference.';document.getElementById('recon-timing-note').style.display='';}
+  else{sc='recon-diff';sm='✗ Bank received '+fmt(diffAbs)+' more than invoiced — check for uninvoiced payments or duplicates.';document.getElementById('recon-timing-note').style.display='none';}
+  statusEl.className='recon-status '+sc;statusEl.textContent=sm;
   const srcLabel=source==='json'?'Reports app (JSON backup, jobs in period)':'Manual entry';
   document.getElementById('recon-table').innerHTML=
     '<thead><tr><th>Item</th><th class="right">Amount (inc. GST)</th><th class="right">Ex. GST</th></tr></thead><tbody>'+
     '<tr><td>'+srcLabel+'</td><td class="right">'+fmt(invoicedTotal)+'</td><td class="right">'+fmt(invoicedTotal/11*10)+'</td></tr>'+
     '<tr><td>Bank received (income account)</td><td class="right">'+fmt(bankTotal)+'</td><td class="right">'+fmt(bankTotal/11*10)+'</td></tr>'+
-    '<tr class="'+(diffAbs<=tolerance?'match':diff>0?'timing':'mismatch')+'"><td><strong>Difference</strong></td><td class="right '+(diff>0?'':'red')+'"><strong>'+(diff>=0?'+':'')+fmtAmt(diff)+'</strong></td><td class="right"></td></tr>'+
-    '</tbody>';
+    '<tr class="'+(diffAbs<=0.10?'match':diff>0?'timing':'mismatch')+'"><td><strong>Difference</strong></td><td class="right '+(diff<0?'red-t':'')+'"><strong>'+(diff>=0?'+':'')+fmtAmt(diff)+'</strong></td><td></td></tr></tbody>';
 }
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  TAX ESTIMATE
-// ═══════════════════════════════════════════
-function calcTax(income){
-  for(const b of TAX_BRACKETS){
-    if(income<=b.max){
-      const tax=b.base+(income-b.min+1)*b.rate;
-      return Math.max(0,tax);
-    }
-  }
-  return 0;
+// ═══════════════════════════════════════════════════════
+function calcTaxAmt(income){
+  for(const b of TAX_BRACKETS){if(income<=b.max)return Math.max(0,b.base+(income-b.min+1)*b.rate);}return 0;
 }
-
 function calcLITO(income){
-  if(income<=37500)return LITO_MAX;
-  if(income<=45000)return LITO_MAX-((income-37500)*0.05);
-  if(income<=66667)return 325-((income-45000)*0.015);
-  return 0;
+  if(income<=37500)return 700;if(income<=45000)return 700-(income-37500)*0.05;
+  if(income<=66667)return 325-(income-45000)*0.015;return 0;
 }
-
 function updateTax(){
-  const {incGST,incNoGST,expGST}=calcBAS();
+  const{incGST,incNoGST,expGST}=calcBAS();
   const periods=Math.max(1,parseInt(document.getElementById('tax-periods').value)||1);
   const otherIncome=Math.max(0,parseFloat(document.getElementById('tax-other').value)||0);
-
-  // Annualise from loaded periods
-  const annualIncGST=(incGST/periods)*4;
-  const annualIncNoGST=(incNoGST/periods)*4;
-  const annualExp=(expGST/periods)*4;
-
-  const annualBusinessIncome=(annualIncGST-annualIncGST/11)+(annualIncNoGST);
-  const annualExpExGST=annualExp-annualExp/11;
-  const netBusinessIncome=Math.max(0,annualBusinessIncome-annualExpExGST);
-  const totalTaxableIncome=netBusinessIncome+otherIncome;
-
-  const grossTax=calcTax(totalTaxableIncome);
-  const lito=Math.min(grossTax,calcLITO(totalTaxableIncome));
-  const medicareLevyAmt=totalTaxableIncome*MEDICARE;
-  const netTax=Math.max(0,grossTax-lito+medicareLevyAmt);
-  const effectiveRate=totalTaxableIncome>0?(netTax/totalTaxableIncome*100):0;
-  const weeklySetAside=netTax/52;
-  const quarterlySetAside=netTax/4;
-
+  const annualIncGST=(incGST/periods)*4;const annualIncNoGST=(incNoGST/periods)*4;const annualExp=(expGST/periods)*4;
+  const annualBusInc=(annualIncGST-annualIncGST/11)+annualIncNoGST;const annualExpExGST=annualExp-annualExp/11;
+  const netBusInc=Math.max(0,annualBusInc-annualExpExGST);const totalTaxable=netBusInc+otherIncome;
+  const grossTax=calcTaxAmt(totalTaxable);const lito=Math.min(grossTax,calcLITO(totalTaxable));
+  const medicare=totalTaxable*0.02;const netTax=Math.max(0,grossTax-lito+medicare);
+  const effRate=totalTaxable>0?(netTax/totalTaxable*100):0;
   document.getElementById('tax-metrics').innerHTML=[
-    {label:'Annual business income (ex. GST)',val:fmt(annualBusinessIncome),cls:''},
+    {label:'Annual business income (ex. GST)',val:fmt(annualBusInc),cls:''},
     {label:'Annual expenses (ex. GST)',val:fmt(annualExpExGST),cls:''},
-    {label:'Net taxable income',val:fmt(totalTaxableIncome),cls:''},
+    {label:'Net taxable income',val:fmt(totalTaxable),cls:''},
     {label:'Estimated tax payable',val:fmt(netTax),cls:'red'},
-    {label:'Effective tax rate',val:effectiveRate.toFixed(1)+'%',cls:'amber'},
+    {label:'Effective tax rate',val:effRate.toFixed(1)+'%',cls:'amber'},
     {label:'Based on',val:periods+(periods===1?' quarter':' quarters'),cls:'highlight'},
   ].map(m=>'<div class="metric '+m.cls+'"><div class="m-label">'+m.label+'</div><div class="m-val">'+m.val+'</div></div>').join('');
-
-  // Find which bracket
   let bracketDesc='Tax-free threshold';
-  for(const b of TAX_BRACKETS){
-    if(totalTaxableIncome>b.min)bracketDesc=(b.rate*100).toFixed(0)+'¢ in the dollar above $'+b.min.toLocaleString();
-  }
-
+  for(const b of TAX_BRACKETS){if(totalTaxable>b.min)bracketDesc=(b.rate*100).toFixed(0)+'¢ in the dollar above $'+b.min.toLocaleString();}
   document.getElementById('tax-table').innerHTML=
     '<thead><tr><th>Item</th><th class="right">Amount</th></tr></thead><tbody>'+
-    '<tr><td>Net taxable income</td><td class="right">'+fmt(totalTaxableIncome)+'</td></tr>'+
+    '<tr><td>Net taxable income</td><td class="right">'+fmt(totalTaxable)+'</td></tr>'+
     '<tr><td>Gross income tax</td><td class="right">'+fmt(grossTax)+'</td></tr>'+
-    '<tr><td>Low income tax offset (LITO)</td><td class="right" style="color:var(--green)">−'+fmt(lito)+'</td></tr>'+
-    '<tr><td>Medicare levy (2%)</td><td class="right">'+fmt(medicareLevyAmt)+'</td></tr>'+
+    '<tr><td>Low income tax offset (LITO)</td><td class="right green-t">−'+fmt(lito)+'</td></tr>'+
+    '<tr><td>Medicare levy (2%)</td><td class="right">'+fmt(medicare)+'</td></tr>'+
     '<tr class="subtotal"><td>Estimated net tax</td><td class="right">'+fmt(netTax)+'</td></tr>'+
-    '<tr><td>Tax bracket</td><td class="right" style="font-family:\'Courier New\',monospace;font-size:12px">'+bracketDesc+'</td></tr>'+
-    '</tbody>';
-
+    '<tr><td>Tax bracket</td><td class="right" style="font-family:\'Courier New\',monospace;font-size:12px">'+bracketDesc+'</td></tr></tbody>';
   document.getElementById('tax-setaside').innerHTML=
     '<thead><tr><th>Set aside</th><th class="right">Amount</th></tr></thead><tbody>'+
-    '<tr><td>Per quarter</td><td class="right amber" style="font-weight:bold;color:#8a5500">'+fmt(quarterlySetAside)+'</td></tr>'+
-    '<tr><td>Per week</td><td class="right">'+fmt(weeklySetAside)+'</td></tr>'+
-    '<tr><td>Plus GST payable per quarter</td><td class="right" style="color:var(--blue)">'+fmt(calcBAS().netGST)+'</td></tr>'+
-    '<tr class="subtotal"><td>Total to set aside this quarter (tax + GST)</td><td class="right">'+fmt(quarterlySetAside+calcBAS().netGST)+'</td></tr>'+
-    '</tbody>';
+    '<tr><td>Per quarter (tax)</td><td class="right" style="font-weight:bold;color:#8a5500">'+fmt(netTax/4)+'</td></tr>'+
+    '<tr><td>Per week</td><td class="right">'+fmt(netTax/52)+'</td></tr>'+
+    '<tr><td>Plus GST payable this quarter</td><td class="right" style="color:var(--blue)">'+fmt(calcBAS().netGST)+'</td></tr>'+
+    '<tr class="net"><td>Total to set aside this quarter</td><td class="right">'+fmt(netTax/4+calcBAS().netGST)+'</td></tr></tbody>';
 }
 
-// ═══════════════════════════════════════════
-//  VENDOR CLEAN
-// ═══════════════════════════════════════════
-function cleanVendor(desc){
-  const d=desc.toUpperCase();
-  if(d.includes('CALTEX'))return'Caltex Bayswater';
-  if(d.includes('PETRO FUELS'))return'Petro Fuels Westminster';
-  if(d.includes('FIVE50'))return'Five50 Auto Parts';
-  if(d.includes('VEALE AUTO'))return'Veale Auto Parts';
-  if(d.includes('JEEP SPARES')||(d.includes('SMP')&&d.includes('SPARES')))return'SMP Jeep Spares';
-  if(d.includes('BURK BASSENDEAN'))return'Burk Bassendean';
-  if(d.includes('BUNNINGS'))return'Bunnings';
-  if(d.includes('TRANSPORT WA'))return'Transport WA Perth';
-  if(d.includes('EBAY')||d.includes('PAYPAL'))return'eBay / PayPal';
-  if(d.includes('AMAZON'))return'Amazon';
-  if(d.includes('COLES'))return'Coles';
-  if(d.includes('BIG W'))return'Big W';
-  if(d.includes('IGA'))return'IGA';
-  if(d.includes('AL MADDINGTON'))return'Al Maddington';
-  if(d.includes('REPCO'))return'Repco';
-  if(d.includes('SUPERCHEAP')||d.includes('SUPER CHEAP'))return'Supercheap Auto';
-  if(d.includes('TOTAL TOOLS'))return'Total Tools';
-  if(d.includes('BOC GAS'))return'BOC Gas';
-  return desc.replace(/\d{2}[A-Z]{3}\d{2,4}.*/,'').replace(/ATMA\d+.*/i,'').replace(/[0-9]{6,}.*/,'').trim().slice(0,35)||desc.slice(0,35);
+// ═══════════════════════════════════════════════════════
+//  INVOICE PDF PARSING
+// ═══════════════════════════════════════════════════════
+const invDrop=document.getElementById('inv-drop-zone');
+invDrop.addEventListener('dragover',e=>{e.preventDefault();invDrop.classList.add('dragover');});
+invDrop.addEventListener('dragleave',()=>invDrop.classList.remove('dragover'));
+invDrop.addEventListener('drop',e=>{e.preventDefault();invDrop.classList.remove('dragover');handleInvoicePDFs(e.dataTransfer.files);});
+
+async function handleInvoicePDFs(files){
+  const pdfs=Array.from(files).filter(f=>f.name.toLowerCase().endsWith('.pdf'));
+  if(!pdfs.length){toast('No PDF files selected.');return;}
+  for(const file of pdfs){
+    if(invoices.find(i=>i.filename===file.name))continue;
+    addInvFileItem(file.name,'processing','Reading…');
+    try{
+      const inv=await parseInvoicePDF(file);
+      invoices.push(inv);
+      updateInvFileItem(file.name,'done',inv.total?fmt(inv.total)+' extracted':'parsed');
+    }catch(err){
+      invoices.push({filename:file.name,rego:'?',date:'?',vehicle:'?',total:0,gst:0,hasGST:false,error:err.message,status:'error'});
+      updateInvFileItem(file.name,'error','Parse error: '+err.message);
+    }
+  }
+  crossRefInvoices();
+  renderInvoiceTable();
+  document.getElementById('inv-file-input').value='';
 }
 
-// ═══════════════════════════════════════════
-//  EXPORT & UTILS
-// ═══════════════════════════════════════════
+async function parseInvoicePDF(file){
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  let fullText='';
+  for(let pn=1;pn<=pdf.numPages;pn++){
+    const page=await pdf.getPage(pn);
+    const content=await page.getTextContent();
+    // Build lines sorted by Y position
+    const lineMap={};
+    for(const item of content.items){
+      if(!item.str||!item.str.trim())continue;
+      const y=Math.round(item.transform[5]);
+      if(!lineMap[y])lineMap[y]=[];
+      lineMap[y].push({x:item.transform[4],text:item.str.trim()});
+    }
+    const sortedYs=Object.keys(lineMap).map(Number).sort((a,b)=>b-a);
+    const lines=sortedYs.map(y=>lineMap[y].sort((a,b)=>a.x-b.x).map(i=>i.text).join(' '));
+    fullText+=lines.join('\n')+'\n';
+  }
+
+  // Extract fields
+  const inv={filename:file.name,rego:'',date:'',vehicle:'',total:0,gst:0,hasGST:false,status:'parsed'};
+
+  // Rego from filename first (most reliable): CarGuys_REGO_Make_Model.pdf
+  const fnMatch=file.name.match(/CarGuys_([A-Z0-9]+)_/i)||file.name.match(/([A-Z0-9]{5,8})/i);
+  if(fnMatch)inv.rego=fnMatch[1].toUpperCase();
+
+  // Rego from PDF text
+  const regoPatterns=[
+    /REGISTRATION\s*([A-Z0-9]{5,8})/i,
+    /REGO\s*([A-Z0-9]{5,8})/i,
+    /REG(?:ISTRATION)?\s*[:\-]?\s*([A-Z0-9]{5,8})/i,
+  ];
+  for(const re of regoPatterns){const m=fullText.match(re);if(m&&m[1]){inv.rego=m[1].toUpperCase();break;}}
+
+  // Date
+  const datePatterns=[
+    /DATE\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
+    /Generated\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
+    /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/,
+  ];
+  for(const re of datePatterns){const m=fullText.match(re);if(m&&m[1]){inv.date=m[1];break;}}
+
+  // Vehicle — look for VEHICLE line
+  const vehicleMatch=fullText.match(/VEHICLE\s+([A-Za-z][A-Za-z0-9\s\-]+?)(?:\s{2,}|\n|REGISTRATION|REGO|CUSTOMER|DATE)/i);
+  if(vehicleMatch)inv.vehicle=vehicleMatch[1].trim().replace(/\s+/g,' ').slice(0,40);
+
+  // Also try from filename
+  if(!inv.vehicle){
+    const parts=file.name.replace('.pdf','').split('_');
+    if(parts.length>=4)inv.vehicle=parts.slice(2).join(' ');
+  }
+
+  // TOTAL (inc. GST) — find the final total line
+  // Multiple patterns for different layout styles
+  const totalPatterns=[
+    /TOTAL\s*\(inc\.?\s*GST\)\s*\$?([\d,]+\.\d{2})/i,
+    /TOTAL\s*\(inc\s*GST\)\s*\$?([\d,]+\.\d{2})/i,
+    /TOTAL\s+\(inc\.?\s*GST\)\s*[\$]?\s*([\d,]+\.\d{2})/i,
+    /TOTAL.*?\$([\d,]+\.\d{2})\s*$/im,
+  ];
+  for(const re of totalPatterns){
+    const matches=[...fullText.matchAll(new RegExp(re.source,re.flags+'g'))];
+    if(matches.length>0){
+      // Take the LAST match — that's the bottom-of-invoice total
+      const last=matches[matches.length-1];
+      inv.total=parseFloat(last[1].replace(/,/g,''));
+      break;
+    }
+  }
+
+  // GST detection
+  const gstMatch=fullText.match(/GST\s*\(10%\)\s*\$?([\d,]+\.\d{2})/i);
+  if(gstMatch){inv.gst=parseFloat(gstMatch[1].replace(/,/g,''));inv.hasGST=true;}
+  else{
+    // Check if there's a GST line at all
+    inv.hasGST=/GST\s*\(10%\)/i.test(fullText);
+    if(inv.hasGST&&inv.total)inv.gst=inv.total/11;
+  }
+
+  // If no GST found at all — pre-GST or cash invoice
+  if(!inv.hasGST)inv.gst=0;
+
+  return inv;
+}
+
+// ═══════════════════════════════════════════════════════
+//  CROSS-REFERENCE INVOICES VS JSON
+// ═══════════════════════════════════════════════════════
+function crossRefInvoices(){
+  if(!reconJobs.length)return;
+  invoices.forEach(inv=>{
+    // Match by rego (primary) — fuzzy on total within $1
+    const match=reconJobs.find(j=>{
+      const regoMatch=j.rego&&inv.rego&&j.rego.toUpperCase()===inv.rego.toUpperCase();
+      const totalMatch=Math.abs(j.invoiceTotal-inv.total)<1.0;
+      return regoMatch&&totalMatch;
+    })||reconJobs.find(j=>{
+      // Fallback: rego only (in case total was adjusted)
+      return j.rego&&inv.rego&&j.rego.toUpperCase()===inv.rego.toUpperCase();
+    });
+    inv.inApp=!!match;
+    inv.appTotal=match?match.invoiceTotal:null;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  INVOICE TABLE RENDER
+// ═══════════════════════════════════════════════════════
+function renderInvoiceTable(){
+  if(!invoices.length)return;
+  document.getElementById('inv-results').style.display='';
+
+  const filter=document.getElementById('inv-filter').value;
+  let rows=invoices;
+  if(filter==='found')rows=rows.filter(i=>i.inApp);
+  if(filter==='missing')rows=rows.filter(i=>!i.inApp&&i.status!=='error');
+  if(filter==='nogst')rows=rows.filter(i=>!i.hasGST);
+
+  const total=invoices.length;
+  const found=invoices.filter(i=>i.inApp).length;
+  const missing=invoices.filter(i=>!i.inApp&&i.status!=='error').length;
+  const nogst=invoices.filter(i=>!i.hasGST).length;
+  const totalValue=invoices.filter(i=>i.inApp!==false||true).reduce((s,i)=>s+i.total,0);
+  const missingValue=invoices.filter(i=>!i.inApp&&i.status!=='error').reduce((s,i)=>s+i.total,0);
+
+  document.getElementById('inv-metrics').innerHTML=[
+    {label:'Invoices uploaded',val:total,cls:'highlight'},
+    {label:'Found in reports app',val:found,cls:'green'},
+    {label:'Missing from app',val:missing,cls:missing>0?'red':'green'},
+    {label:'No GST (pre-reg / cash)',val:nogst,cls:'amber'},
+    {label:'Missing value (inc. GST)',val:fmt(missingValue),cls:missing>0?'red':'green'},
+  ].map(m=>'<div class="metric '+m.cls+'"><div class="m-label">'+m.label+'</div><div class="m-val" style="'+(typeof m.val==='string'&&m.val.startsWith('$')?'font-size:17px':'')+'">'+m.val+'</div></div>').join('');
+
+  document.getElementById('inv-count').textContent=rows.length+' invoice'+(rows.length!==1?'s':'');
+
+  const missing_exists=invoices.some(i=>!i.inApp&&i.status!=='error');
+  document.getElementById('btn-export-missing').style.display=missing_exists?'':'none';
+
+  const tbody=document.getElementById('inv-body');
+  const empty=document.getElementById('inv-empty');
+  if(!rows.length){tbody.innerHTML='';empty.style.display='';return;}
+  empty.style.display='none';
+
+  tbody.innerHTML=rows.map(inv=>{
+    let statusPill;
+    if(inv.status==='error')statusPill='<span class="status-pill pill-error">⚠ Parse error</span>';
+    else if(!inv.hasGST)statusPill='<span class="status-pill pill-nogst">No GST</span>';
+    else if(inv.inApp)statusPill='<span class="status-pill pill-found">✓ In app</span>';
+    else statusPill='<span class="status-pill pill-missing">✗ Missing</span>';
+
+    const gstCell=inv.hasGST?fmt(inv.gst):'<span style="color:var(--text-muted)">—</span>';
+    const totalCell=inv.total?fmt(inv.total):'<span style="color:var(--text-muted)">—</span>';
+
+    return'<tr>'+
+      '<td class="mono" style="color:var(--text-muted);font-size:12px">'+eh(inv.date)+'</td>'+
+      '<td class="mono" style="font-weight:bold;color:var(--navy)">'+eh(inv.rego)+'</td>'+
+      '<td title="'+eh(inv.filename)+'">'+eh(inv.vehicle||'—')+'</td>'+
+      '<td class="right" style="font-weight:bold">'+totalCell+'</td>'+
+      '<td class="right" style="color:var(--blue)">'+gstCell+'</td>'+
+      '<td style="text-align:center">'+statusPill+'</td>'+
+      '</tr>';
+  }).join('');
+}
+
+function addInvFileItem(name,status,msg){
+  const list=document.getElementById('inv-file-list');
+  const div=document.createElement('div');
+  div.className='inv-file-item '+status;div.id='invfi-'+name.replace(/[^a-z0-9]/gi,'_');
+  div.innerHTML='<span style="font-size:18px">'+(status==='done'?'✅':status==='error'?'❌':'⏳')+'</span>'+
+    '<span class="inv-fi-name" title="'+eh(name)+'">'+eh(name)+'</span>'+
+    '<span class="inv-fi-status" id="invfis-'+name.replace(/[^a-z0-9]/gi,'_')+'">'+msg+'</span>';
+  list.appendChild(div);
+}
+function updateInvFileItem(name,status,msg){
+  const id='invfi-'+name.replace(/[^a-z0-9]/gi,'_');
+  const el=document.getElementById(id);
+  if(el){el.className='inv-file-item '+status;el.querySelector('span').textContent=status==='done'?'✅':status==='error'?'❌':'⏳';}
+  const s=document.getElementById('invfis-'+name.replace(/[^a-z0-9]/gi,'_'));
+  if(s)s.textContent=msg;
+}
+
+// ═══════════════════════════════════════════════════════
+//  INVOICE EXPORTS
+// ═══════════════════════════════════════════════════════
+function exportMissingJSON(){
+  const missing=invoices.filter(i=>!i.inApp&&i.status!=='error');
+  if(!missing.length){toast('No missing invoices to export.');return;}
+  const jobs=missing.map(inv=>({
+    jobId:'recovered-'+uid(),
+    rego:inv.rego,
+    date:inv.date,
+    make:inv.vehicle?inv.vehicle.split(' ')[0]:'',
+    model:inv.vehicle?inv.vehicle.split(' ').slice(1).join(' '):'',
+    custName:'The Car Guys',
+    customerType:'carguysinspection',
+    invoiceTotal:inv.total,
+    hasGST:inv.hasGST,
+    recoveredFromPDF:inv.filename,
+    savedAt:new Date().toISOString(),
+    notes:'Recovered from PDF — '+inv.filename,
+  }));
+  const exportData={exportedAt:new Date().toISOString(),version:2,recoveredJobs:jobs,customers:[],history:[],jobs,draft:{}};
+  const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='JW_Recovered_Jobs_'+new Date().toLocaleDateString('en-AU').replace(/\//g,'-')+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+  toast('✓ Exported '+jobs.length+' missing jobs as JSON');
+}
+
+function exportInvoiceCSV(){
+  if(!invoices.length){toast('No invoices loaded.');return;}
+  const header='Filename,Rego,Date,Vehicle,Total (inc GST),GST,Has GST,In App\n';
+  const rows=invoices.map(i=>[
+    '"'+i.filename+'"','"'+i.rego+'"','"'+i.date+'"','"'+(i.vehicle||'')+'"',
+    i.total.toFixed(2),i.gst.toFixed(2),i.hasGST?'Yes':'No',
+    i.inApp===undefined?'Not checked':i.inApp?'Yes':'No'
+  ].join(',')).join('\n');
+  const blob=new Blob([header+rows],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='JW_Invoice_Register_'+new Date().toLocaleDateString('en-AU').replace(/\//g,'-')+'.csv';
+  a.click();URL.revokeObjectURL(a.href);
+  toast('✓ Invoice register exported');
+}
+
+// ═══════════════════════════════════════════════════════
+//  CSV EXPORT (bank)
+// ═══════════════════════════════════════════════════════
 function exportCSV(){
   if(!transactions.length){toast('No transactions to export.');return;}
   const header='Date,Description,Amount,Account,Category,GST\n';
@@ -803,33 +997,30 @@ function exportCSV(){
     return'"'+t.date+'","'+t.desc.replace(/"/g,'""')+'",'+t.amount.toFixed(2)+','+t.account+','+t.category+','+gst;
   }).join('\n');
   const blob=new Blob([header+rows],{type:'text/csv'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='JW_BAS_'+new Date().toLocaleDateString('en-AU').replace(/\//g,'-')+'.csv';
-  a.click();URL.revokeObjectURL(a.href);
-  toast('✓ CSV exported');
+  a.click();URL.revokeObjectURL(a.href);toast('✓ CSV exported');
 }
 
+// ═══════════════════════════════════════════════════════
+//  CLEAR
+// ═══════════════════════════════════════════════════════
 function clearAll(){
-  if(!confirm('Clear all loaded data and start fresh?'))return;
-  transactions=[];reconJobs=[];loaded={income:false,expense:false};periodStart=null;periodEnd=null;
+  if(!confirm('Clear all loaded data?'))return;
+  transactions=[];reconJobs=[];loaded={income:false,expense:false};periodStart=null;periodEnd=null;invoices=[];
   ['income','expense'].forEach(a=>{
     const z=document.getElementById('zone-'+a);z.classList.remove('loaded');
     z.querySelector('.uz-icon').textContent=a==='income'?'📥':'📤';
     document.getElementById(a+'-label').textContent=a==='income'?'Income account':'Expense account';
   });
   document.getElementById('zone-json').classList.remove('loaded');
-  document.getElementById('json-icon').textContent='📋';
-  document.getElementById('json-label').textContent='JW Reports backup';
+  document.getElementById('json-icon').textContent='📋';document.getElementById('json-label').textContent='JW Reports backup';
   document.getElementById('manual-invoiced').value='';
   document.getElementById('btn-proceed').style.display='none';
   ['quarter-display','bas-quarter'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-  updateAll();switchTab('upload');toast('Cleared.');
-}
-
-function toast(msg){
-  const el=document.getElementById('toast');el.textContent=msg;el.style.opacity='1';
-  clearTimeout(window._tt);window._tt=setTimeout(()=>{el.style.opacity='0';},2500);
+  document.getElementById('inv-file-list').innerHTML='';document.getElementById('inv-results').style.display='none';
+  renderTable();updateBAS();updateReconcile();updateTax();
+  switchTab('upload');toast('Cleared.');
 }
 
 // Init
