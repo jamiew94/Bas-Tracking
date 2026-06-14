@@ -1114,14 +1114,20 @@ async function parseInvoicePDF(file){
   ];
   for(const re of datePatterns){const m=fullText.match(re);if(m&&m[1]){inv.date=m[1];break;}}
 
-  // Vehicle — look for VEHICLE line
-  const vehicleMatch=fullText.match(/VEHICLE\s+([A-Za-z][A-Za-z0-9\s\-]+?)(?:\s{2,}|\n|REGISTRATION|REGO|CUSTOMER|DATE)/i);
-  if(vehicleMatch)inv.vehicle=vehicleMatch[1].trim().replace(/\s+/g,' ').slice(0,40);
-
-  // Also try from filename
+  // Vehicle — from filename first (most reliable)
+  // CarGuys_1HDG710_Suzuki_SX4.pdf → "Suzuki SX4"
+  const fnParts=file.name.replace('.pdf','').split('_');
+  if(fnParts.length>=4){
+    inv.vehicle=fnParts.slice(2).join(' ').replace(/__+/g,' ').trim();
+  }
+  // Only use PDF text if filename didn't give a vehicle (non-standard filename)
   if(!inv.vehicle){
-    const parts=file.name.replace('.pdf','').split('_');
-    if(parts.length>=4)inv.vehicle=parts.slice(2).join(' ');
+    const vehicleMatch=fullText.match(/VEHICLE\s+([A-Za-z][A-Za-z0-9\s\-]+?)(?:\s{2,}|\n|REGISTRATION|REGO|CUSTOMER|DATE)/i);
+    if(vehicleMatch){
+      const v=vehicleMatch[1].trim().replace(/\s+/g,' ').slice(0,40);
+      // Reject if it's just "REGISTRATION" or a single word that's clearly not a vehicle
+      if(v&&!v.match(/^(REGISTRATION|REGO|CUSTOMER|DATE|CONTRACT|MECHANIC)$/i))inv.vehicle=v;
+    }
   }
 
   // TOTAL (inc. GST) — find the final total line
