@@ -243,6 +243,7 @@ table.inv td.mono{font-family:'Courier New',monospace;}
     <div class="tab" onclick="switchTab('tax')" id="tab-btn-tax">Tax Estimate</div>
     <div class="tab" onclick="switchTab('upload')" id="tab-btn-upload">Bank Data</div>
     <div class="tab" onclick="switchTab('transactions')" id="tab-btn-transactions">Transactions</div>
+    <div class="tab" onclick="switchTab('jsonmgr')" id="tab-btn-jsonmgr">JSON Manager</div>
   </div>
 
   <!-- ═══ DASHBOARD ═══ -->
@@ -320,6 +321,7 @@ table.inv td.mono{font-family:'Courier New',monospace;}
             <option value="income-nogst">Non-GST income</option>
             <option value="expense">Business expense (GST)</option>
             <option value="drawings">Drawings (excluded)</option>
+            <option value="internal">Internal transfer</option>
             <option value="excluded">Excluded</option>
             <option value="review">⚠ Needs review</option>
           </select>
@@ -549,8 +551,102 @@ table.inv td.mono{font-family:'Courier New',monospace;}
     </div>
   </div>
 
-</div>
-<div id="toast"></div>
+  <!-- ═══ JSON MANAGER ═══ -->
+  <div id="tab-jsonmgr" style="display:none">
+    <div class="card">
+      <div class="card-header">JSON Manager — Merge, Clean &amp; Export</div>
+      <div class="card-body">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Drop one or more reports app JSON backups. They'll be merged and deduplicated automatically. Review every job, delete anything wrong, then export one clean JSON to import into the reports app.</p>
+
+        <!-- Drop zone -->
+        <div class="inv-drop" id="jm-drop-zone">
+          <input type="file" id="jm-file-input" accept=".json" multiple onchange="loadJSONFiles(this.files)">
+          <div class="inv-drop-icon">📋</div>
+          <div class="inv-drop-title">Drop JSON backup files here — multiple files supported</div>
+          <div class="inv-drop-sub">JW_Reports_Backup_*.json · Merges and deduplicates automatically</div>
+        </div>
+
+        <!-- Also drop PDFs to enrich skeleton jobs -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);font-family:'Courier New',monospace;margin-bottom:8px;">Enrich PDF-recovered jobs (optional)</div>
+          <div class="upload-zone" id="jm-pdf-zone" onclick="document.getElementById('jm-pdf-input').click()" style="padding:14px;">
+            <div class="uz-icon" id="jm-pdf-icon">📄</div>
+            <div class="uz-title" id="jm-pdf-label">Drop invoice PDFs to upgrade skeleton jobs</div>
+            <div class="uz-sub">Parser extracts report type, labour, work completed, repair findings</div>
+            <input type="file" id="jm-pdf-input" accept=".pdf" multiple onchange="enrichJobsFromPDFs(this.files)">
+          </div>
+        </div>
+
+        <div id="jm-results" style="display:none">
+          <!-- Metrics -->
+          <div class="metrics-grid" id="jm-metrics"></div>
+
+          <!-- Flags -->
+          <div id="jm-flags" style="margin-bottom:14px;"></div>
+
+          <!-- Toolbar -->
+          <div class="toolbar">
+            <select id="jm-filter" onchange="renderJMTable()">
+              <option value="all">All jobs</option>
+              <option value="native">✓ Full data (native)</option>
+              <option value="recovered">⚠ PDF-recovered (skeleton)</option>
+              <option value="enriched">✨ Enriched from PDF</option>
+              <option value="flagged">🚩 Flagged</option>
+            </select>
+            <select id="jm-sort" onchange="renderJMTable()">
+              <option value="date-desc">Date — newest first</option>
+              <option value="date-asc">Date — oldest first</option>
+              <option value="rego">Rego A–Z</option>
+              <option value="total-desc">Total — highest first</option>
+            </select>
+            <span class="txn-counter" id="jm-count"></span>
+            <button class="btn" style="margin-left:auto;font-size:12px;padding:6px 12px;color:var(--red);border-color:var(--red);" onclick="deleteSelectedJobs()">✕ Delete selected</button>
+          </div>
+
+          <!-- Job table -->
+          <div class="table-wrap">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+              <thead>
+                <tr>
+                  <th style="background:var(--navy-mid);color:white;padding:8px 10px;width:32px;"><input type="checkbox" id="jm-select-all" onchange="toggleSelectAll(this.checked)" style="width:auto;accent-color:white;"></th>
+                  <th style="background:var(--navy-mid);color:white;padding:8px 10px;font-size:11px;letter-spacing:0.5px;font-family:'Courier New',monospace;width:95px;">Date</th>
+                  <th style="background:var(--navy-mid);color:white;padding:8px 10px;font-size:11px;letter-spacing:0.5px;font-family:'Courier New',monospace;width:95px;">Rego</th>
+                  <th style="background:var(--navy-mid);color:white;padding:8px 10px;font-size:11px;letter-spacing:0.5px;font-family:'Courier New',monospace;">Vehicle</th>
+                  <th style="background:var(--navy-mid);color:white;padding:8px 10px;font-size:11px;letter-spacing:0.5px;font-family:'Courier New',monospace;width:80px;">Type</th>
+                  <th style="background:var(--navy-mid);color:white;padding:8px 10px;font-size:11px;letter-spacing:0.5px;font-family:'Courier New',monospace;text-align:right;width:100px;">Total</th>
+                  <th style="background:var(--navy-mid);color:white;padding:8px 10px;font-size:11px;letter-spacing:0.5px;font-family:'Courier New',monospace;text-align:center;width:110px;">Data quality</th>
+                  <th style="background:var(--navy-mid);color:white;padding:8px 10px;font-size:11px;letter-spacing:0.5px;font-family:'Courier New',monospace;text-align:center;width:70px;">Flags</th>
+                </tr>
+              </thead>
+              <tbody id="jm-body"></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="jm-empty" style="display:none">No jobs match this filter.</div>
+
+          <!-- Customers section -->
+          <div id="jm-customers-section" style="margin-top:20px;display:none">
+            <div class="section-title">Saved customers (from loaded backups)</div>
+            <div id="jm-customers-list" style="font-size:13px;"></div>
+          </div>
+
+          <!-- Actions -->
+          <div class="action-row">
+            <button class="btn btn-green" onclick="exportCleanJSON()">↓ Export clean JSON for reports app</button>
+            <button class="btn btn-navy" onclick="exportCustomersJSON()">↓ Export customers JSON</button>
+          </div>
+          <div class="howto" style="margin-top:14px;">
+            <strong>Data quality badges</strong>
+            <strong style="color:var(--green)">Full</strong> — native job with complete inspection data.<br>
+            <strong style="color:var(--blue)">Enriched</strong> — PDF-recovered job upgraded with labour, report type, work completed.<br>
+            <strong style="color:var(--text-muted)">Skeleton</strong> — PDF-recovered, financial data only. Drop PDFs above to upgrade.<br>
+            <strong>Flagged jobs</strong> — duplicate rego, $0 total, or missing critical fields. Review before exporting.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end container -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
@@ -577,9 +673,14 @@ const CATS=[
   {value:'income-nogst',label:'Non-GST income'},
   {value:'expense',label:'Business expense (GST)'},
   {value:'drawings',label:'Drawings (excluded)'},
+  {value:'internal',label:'Internal transfer'},
   {value:'excluded',label:'Excluded'},
   {value:'review',label:'⚠ Needs review'},
 ];
+
+// Jamie's own account numbers — any transfer touching one of these is internal.
+// Account numbers only (no BSBs) — simpler and no risk of BSB collision.
+const JAMIE_ACCOUNTS=['185014087','185014090','125553637','1122072330'];
 
 const TAX_BRACKETS=[
   {min:0,max:18200,rate:0,base:0},
@@ -616,7 +717,7 @@ function toast(msg){
 // ═══════════════════════════════════════════════════════
 function switchTab(name){
   currentTab=name;
-  ['dashboard','upload','transactions','bas','reconcile','tax','invoices','payments'].forEach(t=>{
+  ['dashboard','upload','transactions','bas','reconcile','tax','invoices','payments','jsonmgr'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===name?'':'none';
     document.getElementById('tab-btn-'+t).classList.toggle('active',t===name);
   });
@@ -627,6 +728,7 @@ function switchTab(name){
   if(name==='tax')updateTax();
   if(name==='invoices')renderInvoiceTable();
   if(name==='payments')renderPayTable();
+  if(name==='jsonmgr')renderJMTable();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -788,20 +890,23 @@ function parseCSV(text,acct){
   }
   return rows;
 }
+function isJamieAccount(d){
+  return JAMIE_ACCOUNTS.some(acctNo=>d.includes(acctNo));
+}
 function autoCategory(desc,amt,acct){
   const d=desc.toUpperCase();
+  // Rule 0: Jamie-to-Jamie — highest priority, runs before everything else on both accounts
+  if(isJamieAccount(d))return'internal';
   if(acct==='income'){
-    if(d.includes('MELISSA FARQUHAR')||d.includes('APRIL INVOICES')||d.includes('MAY INVOICES')||d.includes('JUNE INVOICES')||(d.includes('TRANSFER RTP')&&amt>0&&!d.includes('TO 201')))return'income';
+    if(d.includes('MELISSA FARQUHAR')||d.includes('APRIL INVOICES')||d.includes('MAY INVOICES')||d.includes('JUNE INVOICES'))return'income';
+    if(d.includes('TRANSFER RTP')&&amt>0)return'income';
     if(d.includes('CREDIT INTEREST')||d.includes('INTEREST CREDIT'))return'income-nogst';
-    if(d.includes('TRANSFER TO')||d.includes('TRANSFER FROM'))return'excluded';
     if(d.includes('CASHBACK'))return'excluded';
     return amt>0?'review':'excluded';
   }
   if(acct==='expense'){
-    if(d.includes('TRANSFER FROM'))return'excluded';
     if(d.includes('CASHBACK'))return'excluded';
     if(d.includes('SALARY')||d.includes('SLARARY')||d.includes('BTC INVEST'))return'drawings';
-    if((d.includes('TRANSFER RTP')||d.includes('TRANSFER TO'))&&amt<0)return'drawings';
     if(amt>0)return'excluded';
     if(d.includes('CALTEX')||d.includes('PETRO FUELS')||d.includes('BP ')||d.includes('AMPOL'))return'expense';
     if(d.includes('VEALE AUTO')||d.includes('FIVE50')||d.includes('JEEP SPARES')||d.includes('SMP')||d.includes('BURK BASSENDEAN')||d.includes('AUTO PARTS')||d.includes('REPCO')||d.includes('SUPERCHEAP'))return'expense';
@@ -859,7 +964,7 @@ function renderTable(){
   if(!transactions.length){tbody.innerHTML='';empty.style.display='';return;}
   empty.style.display='none';
   tbody.innerHTML=rows.map(t=>{
-    const isExcl=t.category==='excluded'||t.category==='drawings';
+    const isExcl=t.category==='excluded'||t.category==='drawings'||t.category==='internal';
     const ac=isExcl?'amt-excluded':t.amount>0?'amt-income':'amt-expense';
     const as=(t.amount>0?'+':'')+fmtAmt(t.amount);
     const ab='<span class="acc-badge '+t.account+'">'+(t.account==='income'?'087':'090')+'</span>';
@@ -1656,9 +1761,374 @@ function exportPayCSV(){
   toast('✓ Payment register exported');
 }
 
-// Init
+// ═══════════════════════════════════════════════════════
+//  JSON MANAGER
+// ═══════════════════════════════════════════════════════
+let jmJobs=[];        // merged, deduplicated jobs from all loaded JSONs
+let jmCustomers=[];   // merged customers from all loaded JSONs
+let jmSelected=new Set(); // jobIds selected for deletion
+let jmSourceFiles=0;  // how many JSON files loaded
+
+// Drop zone drag events
+const jmDrop=document.getElementById('jm-drop-zone');
+jmDrop.addEventListener('dragover',e=>{e.preventDefault();jmDrop.classList.add('dragover');});
+jmDrop.addEventListener('dragleave',()=>jmDrop.classList.remove('dragover'));
+jmDrop.addEventListener('drop',e=>{e.preventDefault();jmDrop.classList.remove('dragover');loadJSONFiles(e.dataTransfer.files);});
+
+// Load one or more JSON backup files, merge into jmJobs
+function loadJSONFiles(files){
+  const jsonFiles=Array.from(files).filter(f=>f.name.toLowerCase().endsWith('.json'));
+  if(!jsonFiles.length){toast('No JSON files found.');return;}
+  let loaded=0;
+  jsonFiles.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const data=JSON.parse(e.target.result);
+        if(!data.version)throw new Error('Not a valid JW backup');
+        const jobs=data.jobs||[];
+        const customers=data.customers||[];
+        const history=data.history||[];
+        let added=0,dupes=0;
+        // Merge jobs — deduplicate by jobId
+        jobs.forEach(j=>{
+          if(!j.jobId){j.jobId='recovered-'+uid();}
+          if(jmJobs.find(x=>x.jobId===j.jobId)){dupes++;return;}
+          // Tag data quality
+          j._quality=j.recoveredFromPDF?'skeleton':'native';
+          j._flags=autoFlagJob(j);
+          jmJobs.push(j);added++;
+        });
+        // Also pull from history for jobs not in the jobs array
+        history.forEach(h=>{
+          const key=h.rego+'|'+h.date+'|'+h.total;
+          if(!jmJobs.find(j=>j.rego===h.rego&&j.date===h.date&&String(j.invoiceTotal)===String(h.total))){
+            const ghost={
+              jobId:'history-'+uid(),rego:h.rego,date:h.date,
+              make:h.make||'',model:h.model||'',custName:h.custName||'',
+              customerType:h.customerType||'carguysinspection',
+              invoiceTotal:parseFloat(h.total)||0,hasGST:true,
+              reportType:h.reportType||'',savedAt:h.generatedAt||'',
+              _quality:'history',_flags:autoFlagJob({invoiceTotal:parseFloat(h.total)||0,rego:h.rego,date:h.date})
+            };
+            jmJobs.push(ghost);added++;
+          }
+        });
+        // Merge customers
+        customers.forEach(c=>{
+          if(c.name&&!jmCustomers.find(x=>x.name.toLowerCase()===c.name.toLowerCase()))jmCustomers.push(c);
+        });
+        jmSourceFiles++;loaded++;
+        if(loaded===jsonFiles.length){
+          toast('✓ Loaded '+jsonFiles.length+' file'+(jsonFiles.length>1?'s':'')+' · '+jmJobs.length+' unique jobs');
+          document.getElementById('jm-results').style.display='';
+          renderJMTable();
+        }
+      }catch(err){toast('Error reading '+file.name+': '+err.message);}
+    };
+    reader.readAsText(file);
+  });
+  document.getElementById('jm-file-input').value='';
+}
+
+// Auto-flag problems on a job
+function autoFlagJob(j){
+  const flags=[];
+  if(!parseFloat(j.invoiceTotal))flags.push({type:'zero',label:'$0 total'});
+  if(!j.rego||j.rego==='?'||j.rego==='—')flags.push({type:'norego',label:'No rego'});
+  if(!j.date||j.date==='?')flags.push({type:'nodate',label:'No date'});
+  return flags;
+}
+
+// After all jobs loaded, find duplicate regos and add flag
+function flagDuplicateRegos(){
+  const regoCount={};
+  jmJobs.forEach(j=>{if(j.rego)regoCount[j.rego]=(regoCount[j.rego]||0)+1;});
+  jmJobs.forEach(j=>{
+    j._flags=j._flags.filter(f=>f.type!=='duprego');
+    if(j.rego&&regoCount[j.rego]>1)j._flags.push({type:'duprego',label:'Dup rego'});
+  });
+}
+
+// Enrich PDF-recovered (skeleton) jobs using the upgraded PDF parser
+async function enrichJobsFromPDFs(files){
+  const pdfs=Array.from(files).filter(f=>f.name.toLowerCase().endsWith('.pdf'));
+  if(!pdfs.length){toast('No PDFs selected.');return;}
+  document.getElementById('jm-pdf-icon').textContent='⏳';
+  document.getElementById('jm-pdf-label').textContent='Reading '+pdfs.length+' PDFs…';
+  let enriched=0;
+  for(const file of pdfs){
+    const regoMatch=file.name.match(/(?:CarGuys_)?([A-Z0-9]{4,8})_/i);
+    if(!regoMatch)continue;
+    const rego=regoMatch[1].toUpperCase();
+    const job=jmJobs.find(j=>j.rego&&j.rego.toUpperCase()===rego&&j._quality==='skeleton');
+    if(!job)continue; // already native or not in list
+    try{
+      const rich=await parseInvoicePDFRich(file);
+      // Apply enriched fields — don't overwrite financial data already confirmed
+      if(rich.reportType)job.reportType=rich.reportType;
+      if(rich.customerType)job.customerType=rich.customerType;
+      if(rich.labour&&rich.labour.length)job.labour=rich.labour;
+      if(rich.workCompleted)job.workCompleted=rich.workCompleted;
+      if(rich.repairFindings&&rich.repairFindings.length)job.repairFindings=rich.repairFindings;
+      if(rich.date&&job.date==='?')job.date=rich.date;
+      job._quality='enriched';
+      job._flags=autoFlagJob(job);
+      enriched++;
+    }catch(e){/* skip silently */}
+  }
+  flagDuplicateRegos();
+  document.getElementById('jm-pdf-zone').classList.add('loaded');
+  document.getElementById('jm-pdf-icon').textContent='✅';
+  document.getElementById('jm-pdf-label').textContent=enriched+' jobs enriched from PDFs';
+  renderJMTable();
+  toast('✓ Enriched '+enriched+' skeleton jobs from PDFs');
+  document.getElementById('jm-pdf-input').value='';
+}
+
+// Rich PDF parser — extracts everything Devin identified
+async function parseInvoicePDFRich(file){
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  let fullText='';
+  for(let pn=1;pn<=pdf.numPages;pn++){
+    const page=await pdf.getPage(pn);
+    const content=await page.getTextContent();
+    const lineMap={};
+    for(const item of content.items){
+      if(!item.str||!item.str.trim())continue;
+      const y=Math.round(item.transform[5]);
+      if(!lineMap[y])lineMap[y]=[];
+      lineMap[y].push({x:item.transform[4],text:item.str.trim()});
+    }
+    const sortedYs=Object.keys(lineMap).map(Number).sort((a,b)=>b-a);
+    fullText+=sortedYs.map(y=>lineMap[y].sort((a,b)=>a.x-b.x).map(i=>i.text).join(' ')).join('\n')+'\n';
+  }
+  const result={reportType:'',customerType:'carguysinspection',labour:[],workCompleted:'',repairFindings:[],date:''};
+
+  // Report type — check for section headers
+  if(/REPAIR FINDINGS/i.test(fullText))result.reportType='repair';
+  else if(/VEHICLE ESSENTIALS CHECK|SAFETY CHECK/i.test(fullText))result.reportType='safety';
+  else if(/UNDER BONNET|VEHICLE EXTERIOR/i.test(fullText))result.reportType='full';
+  else result.reportType='repair'; // default
+
+  // Customer type
+  if(/To:\s*The Car Guys/i.test(fullText))result.customerType='carguysinspection';
+  else{const cm=fullText.match(/To:\s*([^\n]+)/i);if(cm)result.customerType='private';}
+
+  // Generated date (footer — most reliable)
+  const gd=fullText.match(/Generated\s+(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
+  if(gd)result.date=gd[1];
+
+  // Labour lines — "Description Hrs Rate Amount" table
+  // Match lines that have a number (hours) followed by $rate
+  const labourLines=[];
+  const lines=fullText.split('\n');
+  let inLabour=false;
+  for(const line of lines){
+    if(/Description\s+Hrs\s+Rate|LABOUR DESCRIPTION/i.test(line)){inLabour=true;continue;}
+    if(inLabour){
+      if(/Subtotal|GST|TOTAL|Parts|PARTS/i.test(line)){inLabour=false;continue;}
+      // Match: some text, then hours number, then rate, then amount
+      const lm=line.match(/^(.+?)\s+([\d.]+)\s+\$?([\d.]+)(?:\/hr)?\s+\$?([\d,.]+)/);
+      if(lm){
+        labourLines.push({desc:lm[1].trim(),hrs:parseFloat(lm[2]),rate:parseFloat(lm[3].replace(/,/g,''))});
+      }
+    }
+  }
+  if(labourLines.length)result.labour=labourLines;
+
+  // Work completed — grab text block after "WORK COMPLETED" header
+  const wcMatch=fullText.match(/WORK COMPLETED\s*\n([\s\S]*?)(?:\n\s*\n|\nTAX INVOICE|\nPARTS|$)/i);
+  if(wcMatch){
+    result.workCompleted=wcMatch[1].replace(/[•◦\-]\s*/g,'').replace(/\n+/g,'\n').trim();
+  }
+
+  // Repair findings — Component / Status / Notes rows after "REPAIR FINDINGS"
+  const rfMatch=fullText.match(/REPAIR FINDINGS\s*\n(?:Component\s+Status\s+Notes\s*\n)?([\s\S]*?)(?:\n\s*\n|\nWORK COMPLETED|\nTAX INVOICE|$)/i);
+  if(rfMatch){
+    const rfLines=rfMatch[1].split('\n').filter(l=>l.trim());
+    rfLines.forEach(line=>{
+      const statusMatch=line.match(/\b(CRITICAL|ADVISORY|OK|FAULT)\b/i);
+      if(statusMatch){
+        const status=statusMatch[1].toUpperCase();
+        const parts=line.split(new RegExp('\\b'+status+'\\b','i'));
+        const component=parts[0].trim();
+        const notes=parts[1]?parts[1].trim():'';
+        if(component)result.repairFindings.push({component,status,notes});
+      }
+    });
+  }
+
+  return result;
+}
+
+// Render the job manager table
+function renderJMTable(){
+  if(!jmJobs.length)return;
+  flagDuplicateRegos();
+
+  const filter=document.getElementById('jm-filter').value;
+  const sort=document.getElementById('jm-sort').value;
+
+  let rows=[...jmJobs];
+  if(filter==='native')rows=rows.filter(j=>j._quality==='native');
+  if(filter==='recovered')rows=rows.filter(j=>j._quality==='skeleton');
+  if(filter==='enriched')rows=rows.filter(j=>j._quality==='enriched');
+  if(filter==='flagged')rows=rows.filter(j=>j._flags&&j._flags.length>0);
+
+  // Sort
+  if(sort==='date-desc')rows.sort((a,b)=>parseDateSortDMY(b.date)-parseDateSortDMY(a.date));
+  if(sort==='date-asc')rows.sort((a,b)=>parseDateSortDMY(a.date)-parseDateSortDMY(b.date));
+  if(sort==='rego')rows.sort((a,b)=>(a.rego||'').localeCompare(b.rego||''));
+  if(sort==='total-desc')rows.sort((a,b)=>parseFloat(b.invoiceTotal)-parseFloat(a.invoiceTotal));
+
+  document.getElementById('jm-count').textContent=rows.length+' job'+(rows.length!==1?'s':'');
+
+  // Metrics
+  const native=jmJobs.filter(j=>j._quality==='native').length;
+  const enriched=jmJobs.filter(j=>j._quality==='enriched').length;
+  const skeleton=jmJobs.filter(j=>j._quality==='skeleton').length;
+  const history=jmJobs.filter(j=>j._quality==='history').length;
+  const flagged=jmJobs.filter(j=>j._flags&&j._flags.length>0).length;
+  const totalVal=jmJobs.reduce((s,j)=>s+parseFloat(j.invoiceTotal||0),0);
+  document.getElementById('jm-metrics').innerHTML=[
+    {label:'Total jobs',val:jmJobs.length,cls:'highlight'},
+    {label:'Full data (native)',val:native,cls:'green'},
+    {label:'Enriched from PDF',val:enriched,cls:enriched>0?'green':''},
+    {label:'Skeleton (PDF only)',val:skeleton,cls:skeleton>0?'amber':''},
+    {label:'Flagged — review',val:flagged,cls:flagged>0?'red':'green'},
+    {label:'Total invoiced',val:fmt(totalVal),cls:''},
+  ].map(m=>'<div class="metric '+m.cls+'"><div class="m-label">'+m.label+'</div><div class="m-val" style="'+(typeof m.val==='string'&&m.val.startsWith('$')?'font-size:17px':'')+'">'+m.val+'</div></div>').join('');
+
+  // Flags summary
+  const dupRegoJobs=jmJobs.filter(j=>j._flags.some(f=>f.type==='duprego'));
+  const zeroJobs=jmJobs.filter(j=>j._flags.some(f=>f.type==='zero'));
+  let flagHtml='';
+  if(dupRegoJobs.length){
+    const regoGroups={};
+    dupRegoJobs.forEach(j=>{regoGroups[j.rego]=(regoGroups[j.rego]||[]);regoGroups[j.rego].push(j);});
+    flagHtml+='<div style="background:var(--amber-light);border:1.5px solid var(--amber);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;color:#7a4a00;">'+
+      '<strong style="display:block;margin-bottom:4px;">⚠ Duplicate regos — '+Object.keys(regoGroups).length+' rego'+(Object.keys(regoGroups).length>1?'s appear':'s appear')+' more than once</strong>'+
+      Object.entries(regoGroups).map(([rego,jobs])=>
+        rego+' × '+jobs.length+' ('+jobs.map(j=>j.date||'no date').join(', ')+')'
+      ).join(' · ')+'</div>';
+  }
+  if(zeroJobs.length){
+    flagHtml+='<div style="background:var(--red-light);border:1.5px solid var(--red);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;color:#7a0000;">'+
+      '<strong style="display:block;margin-bottom:4px;">✗ '+zeroJobs.length+' job'+(zeroJobs.length>1?'s have':' has')+' $0 total — check before exporting</strong>'+
+      zeroJobs.map(j=>(j.rego||'?')+' · '+(j.date||'no date')).join(' · ')+'</div>';
+  }
+  document.getElementById('jm-flags').innerHTML=flagHtml;
+
+  // Table rows
+  const tbody=document.getElementById('jm-body');
+  const empty=document.getElementById('jm-empty');
+  if(!rows.length){tbody.innerHTML='';empty.style.display='';return;}
+  empty.style.display='none';
+
+  const qualityBadge={
+    native:'<span style="background:var(--green-light);color:var(--green);font-size:10px;padding:2px 7px;border-radius:100px;font-weight:bold;font-family:\'Courier New\',monospace;">Full</span>',
+    enriched:'<span style="background:var(--blue-light);color:var(--blue);font-size:10px;padding:2px 7px;border-radius:100px;font-weight:bold;font-family:\'Courier New\',monospace;">Enriched</span>',
+    skeleton:'<span style="background:var(--grey-bg);color:var(--text-muted);font-size:10px;padding:2px 7px;border-radius:100px;font-weight:bold;font-family:\'Courier New\',monospace;">Skeleton</span>',
+    history:'<span style="background:var(--amber-light);color:#7a4a00;font-size:10px;padding:2px 7px;border-radius:100px;font-weight:bold;font-family:\'Courier New\',monospace;">History</span>',
+  };
+  const reportLabel={full:'Full',safety:'Safety',repair:'Repair',service:'Service',inspection_repair:'Insp+Rep',service_repair:'Svc+Rep',safety_repair:'Safe+Rep',carguysinspection:'CG'};
+
+  tbody.innerHTML=rows.map((j,i)=>{
+    const sel=jmSelected.has(j.jobId);
+    const flagBadges=(j._flags||[]).map(f=>'<span style="background:var(--red-light);color:var(--red);font-size:10px;padding:1px 5px;border-radius:4px;font-family:\'Courier New\',monospace;margin-left:3px;">'+f.label+'</span>').join('');
+    const vehicle=((j.make||'')+(j.model?' '+j.model:'')).trim()||'—';
+    const rtype=j.reportType?reportLabel[j.reportType]||j.reportType:'—';
+    return'<tr style="'+(sel?'background:#fef3dc;':i%2===0?'':'background:#fafbfd;')+'" onclick="toggleJobSelect(\''+j.jobId+'\',this)">'+
+      '<td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);"><input type="checkbox" '+(sel?'checked':'')+' onchange="toggleJobSelect(\''+j.jobId+'\',null,this.checked)" onclick="event.stopPropagation()" style="width:auto;accent-color:var(--navy);cursor:pointer;"></td>'+
+      '<td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);font-family:\'Courier New\',monospace;font-size:12px;color:var(--text-muted);">'+eh(j.date||'—')+'</td>'+
+      '<td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);font-family:\'Courier New\',monospace;font-weight:bold;color:var(--navy);">'+eh(j.rego||'?')+'</td>'+
+      '<td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);font-size:12px;">'+eh(vehicle)+'</td>'+
+      '<td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);font-size:11px;color:var(--text-muted);font-family:\'Courier New\',monospace;">'+rtype+'</td>'+
+      '<td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);text-align:right;font-family:\'Courier New\',monospace;font-weight:bold;">'+fmt(parseFloat(j.invoiceTotal)||0)+'</td>'+
+      '<td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);text-align:center;">'+(qualityBadge[j._quality]||'')+'</td>'+
+      '<td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);text-align:center;">'+flagBadges+'</td>'+
+      '</tr>';
+  }).join('');
+
+  // Customers
+  const custSection=document.getElementById('jm-customers-section');
+  const custList=document.getElementById('jm-customers-list');
+  if(jmCustomers.length){
+    custSection.style.display='';
+    custList.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:13px;">'+
+      '<thead><tr><th style="background:var(--navy-mid);color:white;padding:7px 10px;font-size:11px;font-family:\'Courier New\',monospace;">Name</th><th style="background:var(--navy-mid);color:white;padding:7px 10px;font-size:11px;font-family:\'Courier New\',monospace;">Mobile</th><th style="background:var(--navy-mid);color:white;padding:7px 10px;font-size:11px;font-family:\'Courier New\',monospace;">Email</th><th style="background:var(--navy-mid);color:white;padding:7px 10px;font-size:11px;font-family:\'Courier New\',monospace;">Last seen</th></tr></thead><tbody>'+
+      jmCustomers.map((c,i)=>'<tr'+(i%2?' style="background:#fafbfd;"':'')+'><td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);">'+eh(c.name||'')+'</td><td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);font-family:\'Courier New\',monospace;font-size:12px;">'+eh(c.mobile||'—')+'</td><td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);font-size:12px;">'+eh(c.email||'—')+'</td><td style="padding:7px 10px;border-bottom:1px solid var(--grey-border);font-size:12px;color:var(--text-muted);">'+eh(c.lastSeen||'—')+'</td></tr>').join('')+
+      '</tbody></table>';
+  }else{
+    custSection.style.display='none';
+  }
+}
+
+function toggleJobSelect(jobId,row,checked){
+  if(checked===undefined)checked=!jmSelected.has(jobId);
+  if(checked)jmSelected.add(jobId);else jmSelected.delete(jobId);
+  if(row)row.style.background=checked?'#fef3dc':'';
+  // update checkbox in row
+  renderJMTable();
+}
+
+function toggleSelectAll(checked){
+  const filter=document.getElementById('jm-filter').value;
+  let visible=jmJobs;
+  if(filter==='native')visible=jmJobs.filter(j=>j._quality==='native');
+  if(filter==='recovered')visible=jmJobs.filter(j=>j._quality==='skeleton');
+  if(filter==='enriched')visible=jmJobs.filter(j=>j._quality==='enriched');
+  if(filter==='flagged')visible=jmJobs.filter(j=>j._flags&&j._flags.length>0);
+  visible.forEach(j=>{if(checked)jmSelected.add(j.jobId);else jmSelected.delete(j.jobId);});
+  renderJMTable();
+}
+
+function deleteSelectedJobs(){
+  if(!jmSelected.size){toast('No jobs selected.');return;}
+  if(!confirm('Delete '+jmSelected.size+' selected job'+(jmSelected.size>1?'s':'')+' permanently?'))return;
+  jmJobs=jmJobs.filter(j=>!jmSelected.has(j.jobId));
+  jmSelected.clear();
+  renderJMTable();
+  toast('✓ Deleted. '+jmJobs.length+' jobs remaining.');
+}
+
+function exportCleanJSON(){
+  if(!jmJobs.length){toast('No jobs to export.');return;}
+  // Strip internal management fields before export
+  const clean=jmJobs.map(j=>{
+    const {_quality,_flags,...rest}=j;
+    return rest;
+  });
+  const out={
+    exportedAt:new Date().toISOString(),
+    version:2,
+    customers:jmCustomers,
+    history:clean.map(j=>({rego:j.rego,make:j.make||'',model:j.model||'',date:j.date,reportType:j.reportType||'',customerType:j.customerType||'',custName:j.custName||'',total:String(j.invoiceTotal),generatedAt:j.savedAt||''})),
+    jobs:clean,
+    draft:{}
+  };
+  const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='JW_Clean_Backup_'+new Date().toLocaleDateString('en-AU').replace(/\//g,'-')+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+  toast('✓ Exported '+clean.length+' jobs');
+}
+
+function exportCustomersJSON(){
+  if(!jmCustomers.length){toast('No customers found in loaded backups.');return;}
+  const blob=new Blob([JSON.stringify({customers:jmCustomers,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='JW_Customers_'+new Date().toLocaleDateString('en-AU').replace(/\//g,'-')+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+  toast('✓ Exported '+jmCustomers.length+' customers');
+}
+
+// ═══════════════════════════════════════════════════════
+//  Init
 renderTable();updateBAS();updateReconcile();updateTax();updateDashboard();
-['upload','transactions','bas','reconcile','tax','invoices','payments'].forEach(t=>{
+['upload','transactions','bas','reconcile','tax','invoices','payments','jsonmgr'].forEach(t=>{
   document.getElementById('tab-'+t).style.display='none';
 });
 </script>
