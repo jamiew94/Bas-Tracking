@@ -145,7 +145,8 @@ table.bas tr.timing td{background:var(--amber-light);}
 /* ── INVOICE TAB ── */
 .inv-drop{border:2px dashed var(--grey-border);border-radius:var(--radius);padding:30px 20px;text-align:center;cursor:pointer;background:var(--grey-bg);transition:all 0.15s;position:relative;margin-bottom:14px;}
 .inv-drop:hover,.inv-drop.dragover{border-color:var(--navy-light);background:#eef1f8;}
-.inv-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;}
+.inv-drop input{display:none;}
+
 .inv-drop-icon{font-size:32px;margin-bottom:8px;}
 .inv-drop-title{font-size:14px;font-weight:bold;color:var(--navy);margin-bottom:4px;}
 .inv-drop-sub{font-size:11px;color:var(--text-muted);font-family:'Courier New',monospace;}
@@ -207,7 +208,7 @@ table.inv td.mono{font-family:'Courier New',monospace;}
 .dash-up-zone{border:1.5px dashed var(--grey-border);border-radius:8px;padding:14px;text-align:center;cursor:pointer;background:var(--grey-bg);font-size:12px;color:var(--text-muted);transition:all 0.15s;position:relative;}
 .dash-up-zone:hover{border-color:var(--navy-light);background:#eef1f8;}
 .dash-up-zone.loaded{border-style:solid;border-color:var(--green);background:var(--green-light);color:var(--green);}
-.dash-up-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.dash-up-zone input{display:none;}
 .dash-up-icon{font-size:20px;margin-bottom:4px;}
 .dash-up-label{font-family:'Courier New',monospace;font-size:11px;}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-family:'Courier New',monospace;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;}
@@ -254,15 +255,17 @@ table.inv td.mono{font-family:'Courier New',monospace;}
     </div>
 
     <div class="dash-quick-upload">
-      <div class="dash-up-zone" id="dash-zone-pdf">
-        <input type="file" id="dash-file-pdf" accept=".pdf" multiple onchange="handlePDFsFromDash(this.files)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+      <div class="dash-up-zone" id="dash-zone-pdf" style="cursor:default;">
+        <input type="file" id="dash-file-pdf" accept=".pdf" multiple onchange="handlePDFsFromDash(this.files)" style="display:none;">
         <div class="dash-up-icon" id="dash-pdf-icon">📄</div>
-        <div class="dash-up-label" id="dash-pdf-label">Drop invoice PDFs</div>
+        <div class="dash-up-label" id="dash-pdf-label">Invoice PDFs</div>
+        <div style="margin-top:8px;"><button class="btn" onclick="document.getElementById('dash-file-pdf').click()" style="font-size:11px;padding:4px 12px;background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:var(--navy);">Browse…</button></div>
       </div>
-      <div class="dash-up-zone" id="dash-zone-csv">
-        <input type="file" id="dash-file-csv" accept=".csv" onchange="loadPayCSV(this.files[0]);loadCSV(this,'income');updateDashboard()" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+      <div class="dash-up-zone" id="dash-zone-csv" style="cursor:default;">
+        <input type="file" id="dash-file-csv" accept=".csv" onchange="loadCSV(this,'income');loadPayCSV(this.files[0])" style="display:none;">
         <div class="dash-up-icon" id="dash-csv-icon">📊</div>
-        <div class="dash-up-label" id="dash-csv-label">Drop income CSV (HSBC ...087)</div>
+        <div class="dash-up-label" id="dash-csv-label">Income CSV (HSBC ...087)</div>
+        <div style="margin-top:8px;"><button class="btn" onclick="document.getElementById('dash-file-csv').click()" style="font-size:11px;padding:4px 12px;background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:var(--navy);">Browse…</button></div>
       </div>
     </div>
 
@@ -275,23 +278,25 @@ table.inv td.mono{font-family:'Courier New',monospace;}
   </div>
 
   <!-- ═══ UPLOAD ═══ -->
-  <div id="tab-upload">
+  <div id="tab-upload" style="display:none">
     <div class="card">
       <div class="card-header">Load bank statements</div>
       <div class="card-body">
         <div id="quarter-display" class="quarter-info" style="display:none"></div>
         <div class="upload-grid">
-          <div class="upload-zone" id="zone-income">
-            <input type="file" id="file-income" accept=".csv" onchange="loadCSV(this,'income')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+          <div class="upload-zone" id="zone-income" style="cursor:default;">
+            <input type="file" id="file-income" accept=".csv" onchange="loadCSV(this,'income')" style="display:none;">
             <div class="uz-icon">📥</div>
             <div class="uz-title" id="income-label">Income account</div>
-            <div class="uz-sub">185014087 — Everyday Savings<br>Car Guys payments &amp; interest</div>
+            <div class="uz-sub" style="margin-bottom:10px;">185014087 — Everyday Savings<br>Car Guys payments &amp; interest</div>
+            <button class="btn btn-navy" onclick="document.getElementById('file-income').click()" style="font-size:12px;padding:6px 16px;">Browse CSV…</button>
           </div>
-          <div class="upload-zone" id="zone-expense">
-            <input type="file" id="file-expense" accept=".csv" onchange="loadCSV(this,'expense')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+          <div class="upload-zone" id="zone-expense" style="cursor:default;">
+            <input type="file" id="file-expense" accept=".csv" onchange="loadCSV(this,'expense')" style="display:none;">
             <div class="uz-icon">📤</div>
             <div class="uz-title" id="expense-label">Expense account</div>
-            <div class="uz-sub">185014090 — Everyday Global<br>Tools, fuel, parts &amp; drawings</div>
+            <div class="uz-sub" style="margin-bottom:10px;">185014090 — Everyday Global<br>Tools, fuel, parts &amp; drawings</div>
+            <button class="btn btn-navy" onclick="document.getElementById('file-expense').click()" style="font-size:12px;padding:6px 16px;">Browse CSV…</button>
           </div>
         </div>
         <div style="text-align:center;margin-top:8px;">
@@ -381,11 +386,12 @@ table.inv td.mono{font-family:'Courier New',monospace;}
       <div class="card-body">
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Bank CSV is your source of truth. Load your reports app JSON backup to cross-check — optional but recommended before lodging.</p>
         <div class="upload-grid">
-          <div class="upload-zone" id="zone-json">
-            <input type="file" id="file-json" accept=".json" onchange="loadJSON(this)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+          <div class="upload-zone" id="zone-json" style="cursor:default;">
+            <input type="file" id="file-json" accept=".json" onchange="loadJSON(this)" style="display:none;">
             <div class="uz-icon" id="json-icon">📋</div>
             <div class="uz-title" id="json-label">Reports app backup <span style="font-size:10px;font-weight:normal;color:var(--text-muted)">(optional)</span></div>
-            <div class="uz-sub">Upload JSON backup from reports app<br>for a triple-check against bank data</div>
+            <div class="uz-sub" style="margin-bottom:10px;">Upload JSON backup from reports app<br>for a triple-check against bank data</div>
+            <button class="btn btn-navy" onclick="document.getElementById('file-json').click()" style="font-size:12px;padding:6px 16px;">Browse JSON…</button>
           </div>
           <div style="display:flex;flex-direction:column;justify-content:center;gap:10px;padding:16px;">
             <div class="field-group">
@@ -442,11 +448,12 @@ table.inv td.mono{font-family:'Courier New',monospace;}
       <div class="card-header">Invoice Reconciliation</div>
       <div class="card-body">
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Upload your saved invoice PDFs. Totals are extracted and cross-referenced against your reports app JSON backup if loaded. "Missing from app" just means no JSON loaded yet — it doesn't block anything.</p>
-        <div class="inv-drop" id="inv-drop-zone">
-          <input type="file" id="inv-file-input" accept=".pdf" multiple onchange="handleInvoicePDFs(this.files)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+        <div class="inv-drop" id="inv-drop-zone" style="cursor:default;">
+          <input type="file" id="inv-file-input" accept=".pdf" multiple onchange="handleInvoicePDFs(this.files)" style="display:none;">
           <div class="inv-drop-icon">📄</div>
-          <div class="inv-drop-title">Drop invoice PDFs here or click to browse</div>
-          <div class="inv-drop-sub">CarGuys_REGO_Make_Model.pdf · Multiple files supported · Also feeds Payments tab automatically</div>
+          <div class="inv-drop-title">Invoice PDFs</div>
+          <div class="inv-drop-sub" style="margin-bottom:12px;">CarGuys_REGO_Make_Model.pdf · Multiple files · Also feeds Payments tab automatically</div>
+          <button class="btn btn-navy" onclick="document.getElementById('inv-file-input').click()" style="font-size:12px;padding:6px 16px;">Browse PDFs…</button>
         </div>
         <div class="inv-file-list" id="inv-file-list"></div>
         <div id="inv-results" style="display:none">
@@ -495,17 +502,19 @@ table.inv td.mono{font-family:'Courier New',monospace;}
       <div class="card-body">
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Upload your invoice PDFs and the income bank CSV. Matches each invoice to a payment by rego. PDFs loaded on the Invoices tab or Dashboard are shared here automatically.</p>
         <div class="upload-grid">
-          <div class="upload-zone" id="pay-zone-pdf">
-            <input type="file" id="pay-file-pdf" accept=".pdf" multiple onchange="handlePaymentPDFs(this.files)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+          <div class="upload-zone" id="pay-zone-pdf" style="cursor:default;">
+            <input type="file" id="pay-file-pdf" accept=".pdf" multiple onchange="handlePaymentPDFs(this.files)" style="display:none;">
             <div class="uz-icon" id="pay-pdf-icon">📄</div>
             <div class="uz-title" id="pay-pdf-label">Invoice PDFs</div>
-            <div class="uz-sub">Drop here, or load on Invoices tab<br>Both tabs share the same PDF data</div>
+            <div class="uz-sub" style="margin-bottom:10px;">Drop here, or load on Invoices tab<br>Both tabs share the same PDF data</div>
+            <button class="btn btn-navy" onclick="document.getElementById('pay-file-pdf').click()" style="font-size:12px;padding:6px 16px;">Browse PDFs…</button>
           </div>
-          <div class="upload-zone" id="pay-zone-csv">
-            <input type="file" id="pay-file-csv" accept=".csv" onchange="loadPayCSV(this.files[0])" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+          <div class="upload-zone" id="pay-zone-csv" style="cursor:default;">
+            <input type="file" id="pay-file-csv" accept=".csv" onchange="loadPayCSV(this.files[0])" style="display:none;">
             <div class="uz-icon" id="pay-csv-icon">📊</div>
             <div class="uz-title" id="pay-csv-label">Income bank CSV</div>
-            <div class="uz-sub">HSBC export — account ...087<br>Melissa Farquhar payments</div>
+            <div class="uz-sub" style="margin-bottom:10px;">HSBC export — account ...087<br>Melissa Farquhar payments</div>
+            <button class="btn btn-navy" onclick="document.getElementById('pay-file-csv').click()" style="font-size:12px;padding:6px 16px;">Browse CSV…</button>
           </div>
         </div>
 
@@ -1143,7 +1152,7 @@ function updateReconcile(){
 //  TAX ESTIMATE
 // ═══════════════════════════════════════════════════════
 function calcTaxAmt(income){
-  for(const b of TAX_BRACKETS){if(income<=b.max)return Math.max(0,b.base+(income-b.min+1)*b.rate);}return 0;
+  for(const b of TAX_BRACKETS){if(income<=b.max)return Math.max(0,b.base+(income-b.min)*b.rate);}return 0;
 }
 function calcLITO(income){
   if(income<=37500)return 700;if(income<=45000)return 700-(income-37500)*0.05;
@@ -1260,9 +1269,10 @@ async function handlePaymentPDFs(files){
   document.getElementById('pay-file-pdf').value='';
 }
 
+const PDFJS_STD_FONTS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 async function parseInvoicePDF(file){
   const buf=await file.arrayBuffer();
-  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  const pdf=await pdfjsLib.getDocument({data:buf,standardFontDataUrl:PDFJS_STD_FONTS}).promise;
   let fullText='';
   for(let pn=1;pn<=pdf.numPages;pn++){
     const page=await pdf.getPage(pn);
@@ -1751,10 +1761,10 @@ function exportPayCSV(){
   const header='Rego,Vehicle,Invoice Date,Invoice Total,Payment Date,Received,Status\n';
   const rows=matches.map(m=>[
     '"'+m.rego+'"',
-    '"'+(m.vehicle||'')+'""',
+    '"'+(m.vehicle||'')+'"',
     '"'+m.date+'"',
     m.invoiceTotal.toFixed(2),
-    '"'+(m.paymentDate||'')+'""',
+    '"'+(m.paymentDate||'')+'"',
     m.received.toFixed(2),
     '"'+m.status+'"'
   ].join(',')).join('\n');
@@ -1845,12 +1855,18 @@ function autoFlagJob(j){
 }
 
 // After all jobs loaded, find duplicate regos and add flag
+// A duplicate is same rego on the same date — NOT a repeat customer (same rego, different dates)
 function flagDuplicateRegos(){
-  const regoCount={};
-  jmJobs.forEach(j=>{if(j.rego)regoCount[j.rego]=(regoCount[j.rego]||0)+1;});
+  const regoDateCount={};
+  jmJobs.forEach(j=>{
+    if(!j.rego)return;
+    const key=j.rego.toUpperCase()+'|'+(j.date||'');
+    regoDateCount[key]=(regoDateCount[key]||0)+1;
+  });
   jmJobs.forEach(j=>{
     j._flags=j._flags.filter(f=>f.type!=='duprego');
-    if(j.rego&&regoCount[j.rego]>1)j._flags.push({type:'duprego',label:'Dup rego'});
+    const key=(j.rego||'').toUpperCase()+'|'+(j.date||'');
+    if(j.rego&&regoDateCount[key]>1)j._flags.push({type:'duprego',label:'Dup rego'});
   });
 }
 
@@ -1893,7 +1909,7 @@ async function enrichJobsFromPDFs(files){
 // Rich PDF parser — extracts everything Devin identified
 async function parseInvoicePDFRich(file){
   const buf=await file.arrayBuffer();
-  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  const pdf=await pdfjsLib.getDocument({data:buf,standardFontDataUrl:PDFJS_STD_FONTS}).promise;
   let fullText='';
   for(let pn=1;pn<=pdf.numPages;pn++){
     const page=await pdf.getPage(pn);
@@ -2132,9 +2148,6 @@ function exportCustomersJSON(){
 // ═══════════════════════════════════════════════════════
 //  Init
 renderTable();updateBAS();updateReconcile();updateTax();updateDashboard();
-['upload','transactions','bas','reconcile','tax','invoices','payments','jsonmgr'].forEach(t=>{
-  document.getElementById('tab-'+t).style.display='none';
-});
 </script>
 </body>
 </html>
