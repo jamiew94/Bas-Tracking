@@ -28,7 +28,7 @@ body{font-family:'Georgia',serif;background:var(--grey-bg);color:var(--text);min
 .tab:hover{color:var(--navy);}
 .tab.active{color:var(--navy);border-bottom-color:var(--amber);font-weight:bold;}
 .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
-.upload-zone{border:2px dashed var(--grey-border);border-radius:var(--radius);padding:24px 16px;text-align:center;cursor:pointer;background:var(--grey-bg);transition:all 0.15s;}
+.upload-zone{border:2px dashed var(--grey-border);border-radius:var(--radius);padding:24px 16px;text-align:center;cursor:pointer;background:var(--grey-bg);transition:all 0.15s;position:relative;}
 .upload-zone:hover{border-color:var(--navy-light);background:#eef1f8;}
 .upload-zone.loaded{border-style:solid;border-color:var(--green);background:var(--green-light);}
 .upload-zone input{display:none;}
@@ -254,13 +254,13 @@ table.inv td.mono{font-family:'Courier New',monospace;}
     </div>
 
     <div class="dash-quick-upload">
-      <div class="dash-up-zone" id="dash-zone-pdf" onclick="document.getElementById('dash-file-pdf').click()">
-        <input type="file" id="dash-file-pdf" accept=".pdf" multiple onchange="handlePDFsFromDash(this.files)">
+      <div class="dash-up-zone" id="dash-zone-pdf">
+        <input type="file" id="dash-file-pdf" accept=".pdf" multiple onchange="handlePDFsFromDash(this.files)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
         <div class="dash-up-icon" id="dash-pdf-icon">📄</div>
         <div class="dash-up-label" id="dash-pdf-label">Drop invoice PDFs</div>
       </div>
-      <div class="dash-up-zone" id="dash-zone-csv" onclick="document.getElementById('dash-file-csv').click()">
-        <input type="file" id="dash-file-csv" accept=".csv" onchange="loadPayCSV(this.files[0]);loadCSV(this,'income');updateDashboard()">
+      <div class="dash-up-zone" id="dash-zone-csv">
+        <input type="file" id="dash-file-csv" accept=".csv" onchange="loadPayCSV(this.files[0]);loadCSV(this,'income');updateDashboard()" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
         <div class="dash-up-icon" id="dash-csv-icon">📊</div>
         <div class="dash-up-label" id="dash-csv-label">Drop income CSV (HSBC ...087)</div>
       </div>
@@ -281,17 +281,17 @@ table.inv td.mono{font-family:'Courier New',monospace;}
       <div class="card-body">
         <div id="quarter-display" class="quarter-info" style="display:none"></div>
         <div class="upload-grid">
-          <div class="upload-zone" id="zone-income" onclick="document.getElementById('file-income').click()">
+          <div class="upload-zone" id="zone-income">
+            <input type="file" id="file-income" accept=".csv" onchange="loadCSV(this,'income')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
             <div class="uz-icon">📥</div>
             <div class="uz-title" id="income-label">Income account</div>
             <div class="uz-sub">185014087 — Everyday Savings<br>Car Guys payments &amp; interest</div>
-            <input type="file" id="file-income" accept=".csv" onchange="loadCSV(this,'income')">
           </div>
-          <div class="upload-zone" id="zone-expense" onclick="document.getElementById('file-expense').click()">
+          <div class="upload-zone" id="zone-expense">
+            <input type="file" id="file-expense" accept=".csv" onchange="loadCSV(this,'expense')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
             <div class="uz-icon">📤</div>
             <div class="uz-title" id="expense-label">Expense account</div>
             <div class="uz-sub">185014090 — Everyday Global<br>Tools, fuel, parts &amp; drawings</div>
-            <input type="file" id="file-expense" accept=".csv" onchange="loadCSV(this,'expense')">
           </div>
         </div>
         <div style="text-align:center;margin-top:8px;">
@@ -381,11 +381,11 @@ table.inv td.mono{font-family:'Courier New',monospace;}
       <div class="card-body">
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Bank CSV is your source of truth. Load your reports app JSON backup to cross-check — optional but recommended before lodging.</p>
         <div class="upload-grid">
-          <div class="upload-zone" id="zone-json" onclick="document.getElementById('file-json').click()">
+          <div class="upload-zone" id="zone-json">
+            <input type="file" id="file-json" accept=".json" onchange="loadJSON(this)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
             <div class="uz-icon" id="json-icon">📋</div>
             <div class="uz-title" id="json-label">Reports app backup <span style="font-size:10px;font-weight:normal;color:var(--text-muted)">(optional)</span></div>
             <div class="uz-sub">Upload JSON backup from reports app<br>for a triple-check against bank data</div>
-            <input type="file" id="file-json" accept=".json" onchange="loadJSON(this)">
           </div>
           <div style="display:flex;flex-direction:column;justify-content:center;gap:10px;padding:16px;">
             <div class="field-group">
@@ -443,7 +443,7 @@ table.inv td.mono{font-family:'Courier New',monospace;}
       <div class="card-body">
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Upload your saved invoice PDFs. Totals are extracted and cross-referenced against your reports app JSON backup if loaded. "Missing from app" just means no JSON loaded yet — it doesn't block anything.</p>
         <div class="inv-drop" id="inv-drop-zone">
-          <input type="file" id="inv-file-input" accept=".pdf" multiple onchange="handleInvoicePDFs(this.files)">
+          <input type="file" id="inv-file-input" accept=".pdf" multiple onchange="handleInvoicePDFs(this.files)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
           <div class="inv-drop-icon">📄</div>
           <div class="inv-drop-title">Drop invoice PDFs here or click to browse</div>
           <div class="inv-drop-sub">CarGuys_REGO_Make_Model.pdf · Multiple files supported · Also feeds Payments tab automatically</div>
@@ -495,17 +495,17 @@ table.inv td.mono{font-family:'Courier New',monospace;}
       <div class="card-body">
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Upload your invoice PDFs and the income bank CSV. Matches each invoice to a payment by rego. PDFs loaded on the Invoices tab or Dashboard are shared here automatically.</p>
         <div class="upload-grid">
-          <div class="upload-zone" id="pay-zone-pdf" onclick="document.getElementById('pay-file-pdf').click()">
+          <div class="upload-zone" id="pay-zone-pdf">
+            <input type="file" id="pay-file-pdf" accept=".pdf" multiple onchange="handlePaymentPDFs(this.files)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
             <div class="uz-icon" id="pay-pdf-icon">📄</div>
             <div class="uz-title" id="pay-pdf-label">Invoice PDFs</div>
             <div class="uz-sub">Drop here, or load on Invoices tab<br>Both tabs share the same PDF data</div>
-            <input type="file" id="pay-file-pdf" accept=".pdf" multiple onchange="handlePaymentPDFs(this.files)">
           </div>
-          <div class="upload-zone" id="pay-zone-csv" onclick="document.getElementById('pay-file-csv').click()">
+          <div class="upload-zone" id="pay-zone-csv">
+            <input type="file" id="pay-file-csv" accept=".csv" onchange="loadPayCSV(this.files[0])" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
             <div class="uz-icon" id="pay-csv-icon">📊</div>
             <div class="uz-title" id="pay-csv-label">Income bank CSV</div>
             <div class="uz-sub">HSBC export — account ...087<br>Melissa Farquhar payments</div>
-            <input type="file" id="pay-file-csv" accept=".csv" onchange="loadPayCSV(this.files[0])">
           </div>
         </div>
 
@@ -559,8 +559,8 @@ table.inv td.mono{font-family:'Courier New',monospace;}
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Drop one or more reports app JSON backups. They'll be merged and deduplicated automatically. Review every job, delete anything wrong, then export one clean JSON to import into the reports app.</p>
 
         <!-- Drop zone -->
-        <div class="inv-drop" id="jm-drop-zone">
-          <input type="file" id="jm-file-input" accept=".json" multiple onchange="loadJSONFiles(this.files)">
+        <div class="inv-drop" id="jm-drop-zone" style="position:relative;">
+          <input type="file" id="jm-file-input" accept=".json" multiple onchange="loadJSONFiles(this.files)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
           <div class="inv-drop-icon">📋</div>
           <div class="inv-drop-title">Drop JSON backup files here — multiple files supported</div>
           <div class="inv-drop-sub">JW_Reports_Backup_*.json · Merges and deduplicates automatically</div>
@@ -569,11 +569,11 @@ table.inv td.mono{font-family:'Courier New',monospace;}
         <!-- Also drop PDFs to enrich skeleton jobs -->
         <div style="margin-bottom:16px;">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);font-family:'Courier New',monospace;margin-bottom:8px;">Enrich PDF-recovered jobs (optional)</div>
-          <div class="upload-zone" id="jm-pdf-zone" onclick="document.getElementById('jm-pdf-input').click()" style="padding:14px;">
+          <div class="upload-zone" id="jm-pdf-zone" style="position:relative;padding:14px;">
+            <input type="file" id="jm-pdf-input" accept=".pdf" multiple onchange="enrichJobsFromPDFs(this.files)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
             <div class="uz-icon" id="jm-pdf-icon">📄</div>
             <div class="uz-title" id="jm-pdf-label">Drop invoice PDFs to upgrade skeleton jobs</div>
             <div class="uz-sub">Parser extracts report type, labour, work completed, repair findings</div>
-            <input type="file" id="jm-pdf-input" accept=".pdf" multiple onchange="enrichJobsFromPDFs(this.files)">
           </div>
         </div>
 
