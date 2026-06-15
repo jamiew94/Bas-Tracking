@@ -559,21 +559,23 @@ table.inv td.mono{font-family:'Courier New',monospace;}
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Drop one or more reports app JSON backups. They'll be merged and deduplicated automatically. Review every job, delete anything wrong, then export one clean JSON to import into the reports app.</p>
 
         <!-- Drop zone -->
-        <div class="inv-drop" id="jm-drop-zone" style="position:relative;">
-          <input type="file" id="jm-file-input" accept=".json" multiple onchange="loadJSONFiles(this.files)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+        <div class="inv-drop" id="jm-drop-zone" style="cursor:default;">
           <div class="inv-drop-icon">📋</div>
-          <div class="inv-drop-title">Drop JSON backup files here — multiple files supported</div>
-          <div class="inv-drop-sub">JW_Reports_Backup_*.json · Merges and deduplicates automatically</div>
+          <div class="inv-drop-title">Drop JSON backup files here</div>
+          <div class="inv-drop-sub" style="margin-bottom:12px;">JW_Reports_Backup_*.json · Merges and deduplicates automatically</div>
+          <button class="btn btn-navy" onclick="document.getElementById('jm-file-input').click()" style="font-size:13px;padding:8px 20px;">Browse files…</button>
+          <input type="file" id="jm-file-input" accept=".json" multiple onchange="loadJSONFiles(this.files)" style="display:none;">
         </div>
 
         <!-- Also drop PDFs to enrich skeleton jobs -->
         <div style="margin-bottom:16px;">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);font-family:'Courier New',monospace;margin-bottom:8px;">Enrich PDF-recovered jobs (optional)</div>
-          <div class="upload-zone" id="jm-pdf-zone" style="position:relative;padding:14px;">
-            <input type="file" id="jm-pdf-input" accept=".pdf" multiple onchange="enrichJobsFromPDFs(this.files)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+          <div class="upload-zone" id="jm-pdf-zone" style="padding:14px;cursor:default;">
+            <input type="file" id="jm-pdf-input" accept=".pdf" multiple onchange="enrichJobsFromPDFs(this.files)" style="display:none;">
             <div class="uz-icon" id="jm-pdf-icon">📄</div>
             <div class="uz-title" id="jm-pdf-label">Drop invoice PDFs to upgrade skeleton jobs</div>
-            <div class="uz-sub">Parser extracts report type, labour, work completed, repair findings</div>
+            <div class="uz-sub" style="margin-bottom:10px;">Parser extracts report type, labour, work completed, repair findings</div>
+            <button class="btn" onclick="document.getElementById('jm-pdf-input').click()" style="font-size:12px;padding:6px 16px;">Browse PDFs…</button>
           </div>
         </div>
 
