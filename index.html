@@ -204,7 +204,19 @@ table.inv td.mono{font-family:'Courier New',monospace;}
 .dash-out-rego{font-family:'Courier New',monospace;font-weight:bold;color:var(--navy);min-width:90px;}
 .dash-out-vehicle{color:var(--text-muted);flex:1;padding:0 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .dash-out-amt{font-family:'Courier New',monospace;font-weight:bold;color:var(--red);}
-.dash-quick-upload{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.dash-quick-upload{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+/* ── CLEAR MODAL ── */
+.clear-modal-overlay{position:fixed;inset:0;background:rgba(10,18,40,0.55);z-index:2000;display:flex;align-items:center;justify-content:center;}
+.clear-modal{background:white;border-radius:12px;box-shadow:0 8px 40px rgba(26,39,68,0.22);width:100%;max-width:420px;overflow:hidden;}
+.clear-modal-header{background:var(--navy);color:white;padding:14px 18px;font-size:14px;font-weight:bold;letter-spacing:0.5px;}
+.clear-modal-body{padding:18px;}
+.clear-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;margin-bottom:8px;border:1.5px solid var(--grey-border);background:var(--grey-bg);cursor:pointer;transition:background 0.12s;}
+.clear-item:hover{background:#eef1f8;border-color:var(--navy-light);}
+.clear-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0;}
+.clear-item-label{flex:1;font-size:13px;color:var(--navy);}
+.clear-item-count{font-size:11px;font-family:'Courier New',monospace;color:var(--text-muted);}
+.clear-modal-empty{text-align:center;padding:20px;font-size:13px;color:var(--text-muted);}
+.clear-modal-footer{display:flex;gap:10px;padding:14px 18px;border-top:1px solid var(--grey-border);justify-content:flex-end;}
 .dash-up-zone{border:1.5px dashed var(--grey-border);border-radius:8px;padding:14px;text-align:center;cursor:pointer;background:var(--grey-bg);font-size:12px;color:var(--text-muted);transition:all 0.15s;position:relative;}
 .dash-up-zone:hover{border-color:var(--navy-light);background:#eef1f8;}
 .dash-up-zone.loaded{border-style:solid;border-color:var(--green);background:var(--green-light);color:var(--green);}
@@ -214,6 +226,7 @@ table.inv td.mono{font-family:'Courier New',monospace;}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-family:'Courier New',monospace;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;}
 @media(max-width:600px){
   .upload-grid{grid-template-columns:1fr;}
+  .dash-quick-upload{grid-template-columns:1fr;}
   .metrics-grid{grid-template-columns:1fr 1fr;}
   .field-row{grid-template-columns:1fr;}
   table.txn .col-desc{max-width:120px;}
@@ -266,6 +279,12 @@ table.inv td.mono{font-family:'Courier New',monospace;}
         <div class="dash-up-icon" id="dash-csv-icon">📊</div>
         <div class="dash-up-label" id="dash-csv-label">Income CSV (HSBC ...087)</div>
         <div style="margin-top:8px;"><button class="btn" onclick="document.getElementById('dash-file-csv').click()" style="font-size:11px;padding:4px 12px;background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:var(--navy);">Browse…</button></div>
+      </div>
+      <div class="dash-up-zone" id="dash-zone-json" style="cursor:default;">
+        <input type="file" id="dash-file-json" accept=".json" onchange="loadJSONFromFile(this.files[0])" style="display:none;">
+        <div class="dash-up-icon" id="dash-json-icon">📋</div>
+        <div class="dash-up-label" id="dash-json-label">Reports app JSON</div>
+        <div style="margin-top:8px;"><button class="btn" onclick="document.getElementById('dash-file-json').click()" style="font-size:11px;padding:4px 12px;background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:var(--navy);">Browse…</button></div>
       </div>
     </div>
 
@@ -659,6 +678,16 @@ table.inv td.mono{font-family:'Courier New',monospace;}
 
 </div><!-- end container -->
 
+<div id="clear-modal-overlay" class="clear-modal-overlay" style="display:none;" onclick="if(event.target===this)closeClearModal()">
+  <div class="clear-modal">
+    <div class="clear-modal-header">✕ Clear loaded data</div>
+    <div class="clear-modal-body" id="clear-modal-body"></div>
+    <div class="clear-modal-footer">
+      <button class="btn" onclick="closeClearModal()">Cancel</button>
+      <button class="btn" style="background:var(--red);color:white;border-color:var(--red);" onclick="executeClear()">Clear selected</button>
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -767,12 +796,12 @@ function updateDashboard(){
   const {incGST,expGST,netGST}=calcBAS();
   const basReady=hasBankCSV&&incGST>0;
 
-  let nextAction='Drop your invoice PDFs in the box above to get started.';
+  let nextAction='Drop your invoice PDFs above to get started.';
   let nextDone=false;
-  if(hasInvoices&&!hasPayCSV) nextAction='Drop your income bank CSV (HSBC ...087) to match payments against invoices.';
+  if(hasInvoices&&!hasPayCSV) nextAction='Drop your income bank CSV (HSBC ...087) above to match payments against invoices.';
   else if(hasInvoices&&hasPayCSV&&unpaid.length>0) nextAction=unpaid.length+' invoice'+(unpaid.length>1?'s are':' is')+' unpaid — chase up or wait for next payment run.';
   else if(hasInvoices&&hasPayCSV&&surplus.length>0) nextAction=surplus.length+' payment'+(surplus.length>1?'s have':' has')+' no invoice yet — finalise those drafts in the reports app.';
-  else if(hasInvoices&&hasPayCSV&&!hasBankCSV) nextAction='Load your full quarter bank CSV on the Bank Data tab to prepare your BAS.';
+  else if(hasInvoices&&hasPayCSV&&!hasBankCSV) nextAction='Drop your full quarter bank CSV above to prepare your BAS.';
   else if(hasInvoices&&hasPayCSV&&hasBankCSV&&!basReady) nextAction='BAS data loaded — review the BAS Summary tab before lodging.';
   else if(hasInvoices&&hasPayCSV&&basReady){nextAction='All invoices matched and BAS data loaded. ✓ You\'re up to date.';nextDone=true;}
 
@@ -784,11 +813,28 @@ function updateDashboard(){
     document.getElementById('dash-zone-pdf').classList.add('loaded');
     document.getElementById('dash-pdf-icon').textContent='✅';
     document.getElementById('dash-pdf-label').textContent=invCount+' invoice'+(invCount!==1?'s':'')+ ' loaded';
+  }else{
+    document.getElementById('dash-zone-pdf').classList.remove('loaded');
+    document.getElementById('dash-pdf-icon').textContent='📄';
+    document.getElementById('dash-pdf-label').textContent='Invoice PDFs';
   }
   if(hasPayCSV){
     document.getElementById('dash-zone-csv').classList.add('loaded');
     document.getElementById('dash-csv-icon').textContent='✅';
     document.getElementById('dash-csv-label').textContent=payPayments.length+' payments loaded';
+  }else{
+    document.getElementById('dash-zone-csv').classList.remove('loaded');
+    document.getElementById('dash-csv-icon').textContent='📊';
+    document.getElementById('dash-csv-label').textContent='Income CSV (HSBC ...087)';
+  }
+  if(hasJSON){
+    document.getElementById('dash-zone-json').classList.add('loaded');
+    document.getElementById('dash-json-icon').textContent='✅';
+    document.getElementById('dash-json-label').textContent=reconJobs.length+' jobs loaded';
+  }else{
+    document.getElementById('dash-zone-json').classList.remove('loaded');
+    document.getElementById('dash-json-icon').textContent='📋';
+    document.getElementById('dash-json-label').textContent='Reports app JSON';
   }
 
   const steps=[
@@ -1050,6 +1096,11 @@ function updateBAS(){
 // ═══════════════════════════════════════════════════════
 function loadJSON(input){
   const file=input.files[0];if(!file)return;
+  loadJSONFromFile(file,()=>{input.value='';});
+}
+
+function loadJSONFromFile(file,callback){
+  if(!file)return;
   const reader=new FileReader();
   reader.onload=e=>{
     try{
@@ -1062,14 +1113,19 @@ function loadJSON(input){
         reconJobs.push({date:j.date,dateSort:parseDateSortDMY(j.date),rego:j.rego||'—',customerType:j.customerType||'',custName:j.custName||'',invoiceTotal:parseFloat(j.invoiceTotal)||0,jobId:j.jobId||key});
       }
       reconJobs.sort((a,b)=>b.dateSort-a.dateSort);
+      // Reconcile tab zone
       document.getElementById('zone-json').classList.add('loaded');
       document.getElementById('json-icon').textContent='✅';
       document.getElementById('json-label').innerHTML=file.name+' — '+reconJobs.length+' jobs';
       document.getElementById('manual-invoiced').value='';
-      updateReconcile();crossRefInvoices();renderInvoiceTable();
+      // Dashboard zone
+      document.getElementById('dash-zone-json').classList.add('loaded');
+      document.getElementById('dash-json-icon').textContent='✅';
+      document.getElementById('dash-json-label').textContent=reconJobs.length+' jobs loaded';
+      updateReconcile();crossRefInvoices();renderInvoiceTable();updateDashboard();
       toast('✓ Loaded '+reconJobs.length+' unique jobs');
     }catch(err){toast('Error reading JSON: '+err.message);}
-    input.value='';
+    if(callback)callback();
   };
   reader.readAsText(file);
 }
@@ -1525,58 +1581,115 @@ function exportCSV(){
 // ═══════════════════════════════════════════════════════
 let currentTab='dashboard';
 
-function clearCurrentTab(){
-  if(['dashboard','upload','transactions','bas','reconcile','tax'].includes(currentTab)) clearBankData();
-  else if(currentTab==='invoices') clearInvoices();
-  else if(currentTab==='payments') clearPayments();
+// ═══════════════════════════════════════════════════════
+//  CLEAR — modal-based, context-aware
+// ═══════════════════════════════════════════════════════
+function showClearModal(){
+  const items=[];
+  if(transactions.length>0)
+    items.push({id:'bank',label:'Bank transactions',count:transactions.length+' transactions',checked:true});
+  if(reconJobs.length>0)
+    items.push({id:'json',label:'Reports app JSON',count:reconJobs.length+' jobs',checked:true});
+  if(sharedPDFs.length>0)
+    items.push({id:'pdfs',label:'Invoice PDFs',count:sharedPDFs.length+' invoices',checked:true});
+  if(payPayments.length>0)
+    items.push({id:'payments',label:'Payment CSV',count:payPayments.length+' payments',checked:true});
+  if(jmJobs.length>0)
+    items.push({id:'jm',label:'JSON Manager jobs',count:jmJobs.length+' jobs',checked:true});
+
+  const body=document.getElementById('clear-modal-body');
+  if(!items.length){
+    body.innerHTML='<div class="clear-modal-empty">Nothing is currently loaded.</div>';
+    document.querySelector('.clear-modal-footer').style.display='none';
+  }else{
+    document.querySelector('.clear-modal-footer').style.display='';
+    body.innerHTML=items.map(it=>
+      '<label class="clear-item">'+
+      '<input type="checkbox" id="clr-'+it.id+'" '+(it.checked?'checked':'')+'>'+
+      '<span class="clear-item-label">'+it.label+'</span>'+
+      '<span class="clear-item-count">'+it.count+'</span>'+
+      '</label>'
+    ).join('');
+  }
+  document.getElementById('clear-modal-overlay').style.display='flex';
 }
 
-function clearBankData(){
-  if(!confirm('Clear all loaded bank data?'))return;
-  transactions=[];reconJobs=[];loaded={income:false,expense:false};periodStart=null;periodEnd=null;
-  ['income','expense'].forEach(a=>{
-    const z=document.getElementById('zone-'+a);z.classList.remove('loaded');
-    z.querySelector('.uz-icon').textContent=a==='income'?'📥':'📤';
-    document.getElementById(a+'-label').textContent=a==='income'?'Income account':'Expense account';
-  });
-  document.getElementById('zone-json').classList.remove('loaded');
-  document.getElementById('json-icon').textContent='📋';
-  document.getElementById('json-label').innerHTML='Reports app backup <span style="font-size:10px;font-weight:normal;color:var(--text-muted)">(optional)</span>';
-  document.getElementById('manual-invoiced').value='';
-  document.getElementById('btn-proceed').style.display='none';
-  ['quarter-display','bas-quarter'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-  renderTable();updateBAS();updateReconcile();updateTax();updateDashboard();
-  toast('Bank data cleared.');
+function closeClearModal(){
+  document.getElementById('clear-modal-overlay').style.display='none';
 }
 
-function clearInvoices(){
-  if(!confirm('Clear all uploaded invoices? This will also clear Payments tab PDF data.'))return;
-  sharedPDFs.length=0; // clear in place so both aliases (invoices, payInvoices) see the change
-  document.getElementById('inv-file-list').innerHTML='';
-  document.getElementById('inv-results').style.display='none';
-  // Reset payments PDF zone
-  document.getElementById('pay-zone-pdf').classList.remove('loaded');
-  document.getElementById('pay-pdf-icon').textContent='📄';
-  document.getElementById('pay-pdf-label').textContent='Invoice PDFs';
-  // Reset dashboard zone
-  document.getElementById('dash-zone-pdf').classList.remove('loaded');
-  document.getElementById('dash-pdf-icon').textContent='📄';
-  document.getElementById('dash-pdf-label').textContent='Drop invoice PDFs';
-  updateDashboard();
-  toast('Invoices cleared.');
+function executeClear(){
+  const get=id=>{const el=document.getElementById('clr-'+id);return el&&el.checked;};
+  let cleared=[];
+
+  if(get('bank')){
+    transactions=[];loaded={income:false,expense:false};periodStart=null;periodEnd=null;
+    ['income','expense'].forEach(a=>{
+      const z=document.getElementById('zone-'+a);
+      if(z){z.classList.remove('loaded');z.querySelector('.uz-icon').textContent=a==='income'?'📥':'📤';}
+      const lbl=document.getElementById(a+'-label');
+      if(lbl)lbl.textContent=a==='income'?'Income account':'Expense account';
+    });
+    const btnP=document.getElementById('btn-proceed');if(btnP)btnP.style.display='none';
+    ['quarter-display','bas-quarter'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    cleared.push('bank transactions');
+  }
+
+  if(get('json')){
+    reconJobs=[];
+    document.getElementById('zone-json').classList.remove('loaded');
+    document.getElementById('json-icon').textContent='📋';
+    document.getElementById('json-label').innerHTML='Reports app backup <span style="font-size:10px;font-weight:normal;color:var(--text-muted)">(optional)</span>';
+    document.getElementById('manual-invoiced').value='';
+    // Reset dashboard JSON zone
+    document.getElementById('dash-zone-json').classList.remove('loaded');
+    document.getElementById('dash-json-icon').textContent='📋';
+    document.getElementById('dash-json-label').textContent='Reports app JSON';
+    cleared.push('JSON backup');
+  }
+
+  if(get('pdfs')){
+    sharedPDFs.length=0;
+    const fileList=document.getElementById('inv-file-list');if(fileList)fileList.innerHTML='';
+    const invRes=document.getElementById('inv-results');if(invRes)invRes.style.display='none';
+    document.getElementById('pay-zone-pdf').classList.remove('loaded');
+    document.getElementById('pay-pdf-icon').textContent='📄';
+    document.getElementById('pay-pdf-label').textContent='Invoice PDFs';
+    document.getElementById('dash-zone-pdf').classList.remove('loaded');
+    document.getElementById('dash-pdf-icon').textContent='📄';
+    document.getElementById('dash-pdf-label').textContent='Invoice PDFs';
+    cleared.push('invoice PDFs');
+  }
+
+  if(get('payments')){
+    payPayments=[];
+    document.getElementById('pay-zone-csv').classList.remove('loaded');
+    document.getElementById('pay-csv-icon').textContent='📊';
+    document.getElementById('pay-csv-label').textContent='Income bank CSV';
+    const payRes=document.getElementById('pay-results');if(payRes)payRes.style.display='none';
+    const payFile=document.getElementById('pay-file-csv');if(payFile)payFile.value='';
+    cleared.push('payment CSV');
+  }
+
+  if(get('jm')){
+    jmJobs=[];jmCustomers=[];jmSelected=new Set();jmSourceFiles=0;
+    const jmRes=document.getElementById('jm-results');if(jmRes)jmRes.style.display='none';
+    const jmFile=document.getElementById('jm-file-input');if(jmFile)jmFile.value='';
+    cleared.push('JSON Manager');
+  }
+
+  closeClearModal();
+  if(cleared.length){
+    renderTable();updateBAS();updateReconcile();updateTax();updateDashboard();
+    toast('✓ Cleared: '+cleared.join(', ')+'.');
+  }
 }
 
-function clearPayments(){
-  if(!confirm('Clear payments bank CSV? (Invoice PDFs are shared — clear them from the Invoices tab.)'))return;
-  payPayments=[];
-  document.getElementById('pay-zone-csv').classList.remove('loaded');
-  document.getElementById('pay-csv-icon').textContent='📊';
-  document.getElementById('pay-csv-label').textContent='Income bank CSV';
-  document.getElementById('pay-results').style.display='none';
-  document.getElementById('pay-file-csv').value='';
-  updateDashboard();
-  toast('Payment CSV cleared.');
-}
+// Replace the old clearCurrentTab with the modal
+function clearCurrentTab(){showClearModal();}
+function clearBankData(){showClearModal();}
+function clearInvoices(){showClearModal();}
+function clearPayments(){showClearModal();}
 
 // ═══════════════════════════════════════════════════════
 //  PAYMENTS TAB
