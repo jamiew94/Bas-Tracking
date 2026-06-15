@@ -106,6 +106,7 @@ table.bas tr.timing td{background:var(--amber-light);}
 .recon-diff{background:var(--red-light);border:1.5px solid var(--red);color:var(--red);}
 .recon-timing{background:var(--amber-light);border:1.5px solid var(--amber);color:#7a4a00;}
 .recon-empty{background:var(--grey-bg);border:1.5px solid var(--grey-border);color:var(--text-muted);}
+.recon-bank-only{background:var(--blue-light);border:1.5px solid #b8d0f0;color:var(--navy-mid);}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
 .field-group{display:flex;flex-direction:column;gap:6px;}
 .field-group label{font-size:11px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);font-family:'Courier New',monospace;}
@@ -169,6 +170,7 @@ table.inv td.mono{font-family:'Courier New',monospace;}
 .pill-nogst{background:var(--blue-light);color:var(--blue);}
 .pill-processing{background:var(--amber-light);color:#7a4a00;}
 .pill-error{background:var(--grey-bg);color:var(--text-muted);}
+.pill-nocrossref{background:var(--grey-bg);color:var(--text-muted);}
 /* ── DASHBOARD ── */
 .dash-hero{background:var(--navy);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;color:white;}
 .dash-hero-title{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.5);font-family:'Courier New',monospace;margin-bottom:6px;}
@@ -245,16 +247,14 @@ table.inv td.mono{font-family:'Courier New',monospace;}
 
   <!-- ═══ DASHBOARD ═══ -->
   <div id="tab-dashboard">
-    <!-- Next action hero -->
     <div class="dash-hero">
       <div class="dash-hero-title">Next action</div>
       <div class="dash-next" id="dash-next-action">Load your invoice PDFs to get started.</div>
     </div>
 
-    <!-- Quick upload strip -->
     <div class="dash-quick-upload">
       <div class="dash-up-zone" id="dash-zone-pdf" onclick="document.getElementById('dash-file-pdf').click()">
-        <input type="file" id="dash-file-pdf" accept=".pdf" multiple onchange="loadPayPDFs(this.files);loadInvoicesFromDash(this.files)">
+        <input type="file" id="dash-file-pdf" accept=".pdf" multiple onchange="handlePDFsFromDash(this.files)">
         <div class="dash-up-icon" id="dash-pdf-icon">📄</div>
         <div class="dash-up-label" id="dash-pdf-label">Drop invoice PDFs</div>
       </div>
@@ -265,10 +265,8 @@ table.inv td.mono{font-family:'Courier New',monospace;}
       </div>
     </div>
 
-    <!-- Step checklist -->
     <div class="dash-steps" id="dash-steps"></div>
 
-    <!-- Outstanding invoices -->
     <div class="dash-outstanding" id="dash-outstanding" style="display:none">
       <div class="dash-outstanding-header" id="dash-out-header">Outstanding invoices</div>
       <div id="dash-out-body"></div>
@@ -379,12 +377,12 @@ table.inv td.mono{font-family:'Courier New',monospace;}
     <div class="card">
       <div class="card-header">Reconcile — Reports App vs Bank</div>
       <div class="card-body">
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Cross-check invoiced totals from the reports app against what actually landed in your bank.</p>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Bank CSV is your source of truth. Load your reports app JSON backup to cross-check — optional but recommended before lodging.</p>
         <div class="upload-grid">
           <div class="upload-zone" id="zone-json" onclick="document.getElementById('file-json').click()">
             <div class="uz-icon" id="json-icon">📋</div>
-            <div class="uz-title" id="json-label">JW Reports backup</div>
-            <div class="uz-sub">Upload your JSON backup file<br>from the reports app</div>
+            <div class="uz-title" id="json-label">Reports app backup <span style="font-size:10px;font-weight:normal;color:var(--text-muted)">(optional)</span></div>
+            <div class="uz-sub">Upload JSON backup from reports app<br>for a triple-check against bank data</div>
             <input type="file" id="file-json" accept=".json" onchange="loadJSON(this)">
           </div>
           <div style="display:flex;flex-direction:column;justify-content:center;gap:10px;padding:16px;">
@@ -395,9 +393,9 @@ table.inv td.mono{font-family:'Courier New',monospace;}
             <p style="font-size:11px;color:var(--text-muted);font-family:'Courier New',monospace;">Manual total used only if no JSON is loaded.</p>
           </div>
         </div>
-        <div id="recon-status" class="recon-status recon-empty">Load bank CSVs and upload a JSON backup or enter a total to reconcile.</div>
+        <div id="recon-status" class="recon-status recon-empty">Load your bank CSV on the Bank Data tab to see income received this period.</div>
         <div id="recon-detail" style="display:none">
-          <div class="section-title">Comparison</div>
+          <div class="section-title" id="recon-section-label">Income received (bank)</div>
           <table class="bas" id="recon-table"></table>
           <div class="section-title" id="jobs-section-title" style="display:none">Jobs in period (from reports app)</div>
           <div class="jobs-list" id="jobs-list"></div>
@@ -441,12 +439,12 @@ table.inv td.mono{font-family:'Courier New',monospace;}
     <div class="card">
       <div class="card-header">Invoice Reconciliation</div>
       <div class="card-body">
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Upload your saved invoice PDFs. The tool extracts each invoice total and cross-references against your reports app JSON backup. Identifies what's in the system vs missing.</p>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Upload your saved invoice PDFs. Totals are extracted and cross-referenced against your reports app JSON backup if loaded. "Missing from app" just means no JSON loaded yet — it doesn't block anything.</p>
         <div class="inv-drop" id="inv-drop-zone">
           <input type="file" id="inv-file-input" accept=".pdf" multiple onchange="handleInvoicePDFs(this.files)">
           <div class="inv-drop-icon">📄</div>
           <div class="inv-drop-title">Drop invoice PDFs here or click to browse</div>
-          <div class="inv-drop-sub">CarGuys_REGO_Make_Model.pdf · Multiple files supported · Processing in your browser</div>
+          <div class="inv-drop-sub">CarGuys_REGO_Make_Model.pdf · Multiple files supported · Also feeds Payments tab automatically</div>
         </div>
         <div class="inv-file-list" id="inv-file-list"></div>
         <div id="inv-results" style="display:none">
@@ -481,7 +479,7 @@ table.inv td.mono{font-family:'Courier New',monospace;}
           </div>
           <div class="howto" style="margin-top:14px;">
             <strong>Export missing jobs JSON</strong>
-            Downloads a JSON file of invoices not found in the reports app. You can import this into the reports app to restore missing records. The JSON includes: rego, date, vehicle, invoice total, GST flag — enough to restore the financial record. Inspection data is not recoverable from the PDF alone.
+            Downloads a JSON file of invoices not found in the reports app. Import into the reports app to restore missing records. Includes: rego, date, vehicle, invoice total, GST flag. Inspection data is not recoverable from the PDF alone.
           </div>
         </div>
       </div>
@@ -493,13 +491,13 @@ table.inv td.mono{font-family:'Courier New',monospace;}
     <div class="card">
       <div class="card-header">Payment Matching — Invoices vs Bank</div>
       <div class="card-body">
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Upload your invoice PDFs and the income bank CSV. Matches each invoice to a payment by rego. Shows exactly what's paid (archive it) and what's outstanding.</p>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Upload your invoice PDFs and the income bank CSV. Matches each invoice to a payment by rego. PDFs loaded on the Invoices tab or Dashboard are shared here automatically.</p>
         <div class="upload-grid">
           <div class="upload-zone" id="pay-zone-pdf" onclick="document.getElementById('pay-file-pdf').click()">
             <div class="uz-icon" id="pay-pdf-icon">📄</div>
             <div class="uz-title" id="pay-pdf-label">Invoice PDFs</div>
-            <div class="uz-sub">Drop all invoices for the period<br>CarGuys_REGO_Make_Model.pdf</div>
-            <input type="file" id="pay-file-pdf" accept=".pdf" multiple onchange="loadPayPDFs(this.files)">
+            <div class="uz-sub">Drop here, or load on Invoices tab<br>Both tabs share the same PDF data</div>
+            <input type="file" id="pay-file-pdf" accept=".pdf" multiple onchange="handlePaymentPDFs(this.files)">
           </div>
           <div class="upload-zone" id="pay-zone-csv" onclick="document.getElementById('pay-file-csv').click()">
             <div class="uz-icon" id="pay-csv-icon">📊</div>
@@ -512,7 +510,6 @@ table.inv td.mono{font-family:'Courier New',monospace;}
         <div id="pay-results" style="display:none">
           <div class="metrics-grid" id="pay-metrics"></div>
 
-          <!-- matched invoices -->
           <div class="section-title">Invoice payment status</div>
           <div class="toolbar">
             <select id="pay-filter" onchange="renderPayTable()">
@@ -566,8 +563,13 @@ let transactions=[];
 let loaded={income:false,expense:false};
 let reconJobs=[];
 let periodStart=null,periodEnd=null;
-let invoices=[];
-let payInvoices=[];   // invoices loaded in payments tab
+
+// Shared PDF state — both Invoices and Payments tab read from these same arrays.
+// parsedPDFs is the canonical list; invoices and payInvoices are references to it.
+let sharedPDFs=[];      // canonical parsed PDF array, both tabs read this
+let invoices=sharedPDFs;     // Invoices tab alias
+let payInvoices=sharedPDFs;  // Payments tab alias
+
 let payPayments=[];   // bank payments loaded in payments tab
 
 const CATS=[
@@ -630,16 +632,16 @@ function switchTab(name){
 // ═══════════════════════════════════════════════════════
 //  DASHBOARD
 // ═══════════════════════════════════════════════════════
-function loadInvoicesFromDash(files){
-  // Mirror PDFs into both invoices and payInvoices arrays
-  handleInvoicePDFs(files);
-  // dash zone update handled by individual loaders via updateDashboard calls
+
+// Dashboard PDF drop — feeds the shared array, refreshes both tabs
+async function handlePDFsFromDash(files){
+  await parsePDFsIntoSharedState(files,'dash');
+  updateDashboard();
 }
 
 function updateDashboard(){
-  // ── Step states ──
-  const hasInvoices=payInvoices.length>0||invoices.length>0;
-  const invCount=Math.max(payInvoices.length,invoices.length);
+  const hasInvoices=sharedPDFs.length>0;
+  const invCount=sharedPDFs.length;
   const hasPayCSV=payPayments.length>0;
   const hasBankCSV=transactions.length>0;
   const hasJSON=reconJobs.length>0;
@@ -650,22 +652,19 @@ function updateDashboard(){
   const {incGST,expGST,netGST}=calcBAS();
   const basReady=hasBankCSV&&incGST>0;
 
-  // ── Next action ──
-  let nextAction='Load your invoice PDFs to get started.';
+  let nextAction='Drop your invoice PDFs in the box above to get started.';
   let nextDone=false;
-  if(!hasInvoices) nextAction='Drop your invoice PDFs in the box above to get started.';
-  else if(!hasPayCSV) nextAction='Drop your income bank CSV (HSBC ...087) to match payments against invoices.';
-  else if(unpaid.length>0) nextAction=unpaid.length+' invoice'+(unpaid.length>1?'s are':' is')+' unpaid — chase up or wait for next payment run.';
-  else if(surplus.length>0) nextAction=surplus.length+' payment'+(surplus.length>1?'s have':' has')+' no invoice yet — finalise those drafts in the reports app.';
-  else if(!hasBankCSV) nextAction='Load your full quarter bank CSV on the Bank Data tab to prepare your BAS.';
-  else if(!basReady) nextAction='BAS data loaded — review the BAS Summary tab before lodging.';
-  else{nextAction='All invoices matched and BAS data loaded. ✓ You\'re up to date.';nextDone=true;}
+  if(hasInvoices&&!hasPayCSV) nextAction='Drop your income bank CSV (HSBC ...087) to match payments against invoices.';
+  else if(hasInvoices&&hasPayCSV&&unpaid.length>0) nextAction=unpaid.length+' invoice'+(unpaid.length>1?'s are':' is')+' unpaid — chase up or wait for next payment run.';
+  else if(hasInvoices&&hasPayCSV&&surplus.length>0) nextAction=surplus.length+' payment'+(surplus.length>1?'s have':' has')+' no invoice yet — finalise those drafts in the reports app.';
+  else if(hasInvoices&&hasPayCSV&&!hasBankCSV) nextAction='Load your full quarter bank CSV on the Bank Data tab to prepare your BAS.';
+  else if(hasInvoices&&hasPayCSV&&hasBankCSV&&!basReady) nextAction='BAS data loaded — review the BAS Summary tab before lodging.';
+  else if(hasInvoices&&hasPayCSV&&basReady){nextAction='All invoices matched and BAS data loaded. ✓ You\'re up to date.';nextDone=true;}
 
   const nextEl=document.getElementById('dash-next-action');
   nextEl.textContent=nextAction;
   nextEl.className='dash-next'+(nextDone?' all-good':'');
 
-  // ── Quick upload zone sync ──
   if(hasInvoices){
     document.getElementById('dash-zone-pdf').classList.add('loaded');
     document.getElementById('dash-pdf-icon').textContent='✅';
@@ -677,15 +676,14 @@ function updateDashboard(){
     document.getElementById('dash-csv-label').textContent=payPayments.length+' payments loaded';
   }
 
-  // ── Steps ──
   const steps=[
     {
       id:'invoices',
       icon: hasInvoices?'✅':'📄',
-      state: hasInvoices?(invoices.some(i=>!i.inApp)&&hasJSON?'partial':'done'):'todo',
+      state: hasInvoices?(sharedPDFs.some(i=>!i.inApp)&&hasJSON?'partial':'done'):'todo',
       title:'1. Invoices',
       desc: hasInvoices
-        ? invCount+' loaded · '+fmt(payInvoices.reduce((s,i)=>s+i.total,0))+' total'+(hasJSON?' · '+(invoices.filter(i=>!i.inApp).length)+' missing from app':'')
+        ? invCount+' loaded · '+fmt(sharedPDFs.reduce((s,i)=>s+i.total,0))+' total'+(hasJSON?' · '+(sharedPDFs.filter(i=>!i.inApp).length)+' missing from app':'')
         : 'Upload your invoice PDFs',
       badge: hasInvoices?invCount+' invoices':'Not loaded',
     },
@@ -700,13 +698,13 @@ function updateDashboard(){
     },
     {
       id:'reconcile',
-      icon: !hasJSON?'📋':!hasBankCSV?'📋':'✅',
-      state: !hasJSON||!hasBankCSV?'todo':'done',
+      icon: !hasBankCSV?'📋':hasJSON?'✅':'📋',
+      state: !hasBankCSV?'todo':hasJSON?'done':'partial',
       title:'3. Reconcile',
-      desc: !hasJSON?'Upload reports app JSON backup'
-        :!hasBankCSV?'Load full quarter bank CSV'
+      desc: !hasBankCSV?'Load full quarter bank CSV'
+        :!hasJSON?'Bank loaded · load reports app JSON for full comparison'
         :'JSON + bank loaded · check totals match',
-      badge: hasJSON&&hasBankCSV?'Ready':'Not loaded',
+      badge: !hasBankCSV?'Not loaded':hasJSON?'Ready':'Bank only',
     },
     {
       id:'bas',
@@ -731,7 +729,6 @@ function updateDashboard(){
     '</div>'
   ).join('');
 
-  // ── Outstanding invoices list ──
   const outEl=document.getElementById('dash-outstanding');
   const outBody=document.getElementById('dash-out-body');
   const outHeader=document.getElementById('dash-out-header');
@@ -752,7 +749,6 @@ function updateDashboard(){
         '</div>'
       ).join('');
     }
-    // Show surplus below if any
     if(surplus.length>0){
       const surplusHeader='<div style="padding:8px 16px;background:var(--amber-light);font-size:12px;font-family:\'Courier New\',monospace;color:#7a4a00;border-top:1.5px solid var(--amber)">'+
         '⚠ '+surplus.length+' payment'+(surplus.length>1?'s':'')+' with no invoice yet (drafts) · '+fmt(surplus.reduce((s,m)=>s+m.received,0))+'</div>';
@@ -950,18 +946,36 @@ function loadJSON(input){
       reconJobs.sort((a,b)=>b.dateSort-a.dateSort);
       document.getElementById('zone-json').classList.add('loaded');
       document.getElementById('json-icon').textContent='✅';
-      document.getElementById('json-label').textContent=file.name+' — '+reconJobs.length+' jobs';
+      document.getElementById('json-label').innerHTML=file.name+' — '+reconJobs.length+' jobs';
       document.getElementById('manual-invoiced').value='';
-      updateReconcile();crossRefInvoices();
+      updateReconcile();crossRefInvoices();renderInvoiceTable();
       toast('✓ Loaded '+reconJobs.length+' unique jobs');
     }catch(err){toast('Error reading JSON: '+err.message);}
     input.value='';
   };
   reader.readAsText(file);
 }
+
 function updateReconcile(){
-  const{incGST}=calcBAS();const bankTotal=incGST;
-  let invoicedTotal=0,source='none';
+  const{incGST}=calcBAS();
+  const bankTotal=incGST;
+  const statusEl=document.getElementById('recon-status');
+  const detailEl=document.getElementById('recon-detail');
+
+  // Bank CSV not loaded yet — only state where we show nothing useful
+  if(bankTotal===0&&!transactions.length){
+    statusEl.className='recon-status recon-empty';
+    statusEl.textContent='Load your bank CSV on the Bank Data tab to see income received this period.';
+    detailEl.style.display='none';
+    return;
+  }
+
+  // Bank loaded — always show the detail panel
+  detailEl.style.display='';
+  document.getElementById('recon-timing-note').style.display='none';
+
+  // Determine if we have a comparison source (JSON or manual)
+  let invoicedTotal=0,source='bank-only';
   if(reconJobs.length>0){
     const jobsInPeriod=periodStart&&periodEnd?reconJobs.filter(j=>j.dateSort>=periodStart-86400000*3&&j.dateSort<=periodEnd+86400000*3):reconJobs;
     invoicedTotal=jobsInPeriod.reduce((s,j)=>s+j.invoiceTotal,0);source='json';
@@ -970,28 +984,50 @@ function updateReconcile(){
       const inP=!periodStart||!periodEnd||(j.dateSort>=periodStart-86400000*3&&j.dateSort<=periodEnd+86400000*3);
       return'<div class="job-row'+(inP?'':' outside-period')+'"><span>'+j.date+' · <strong>'+eh(j.rego)+'</strong>'+(j.custName?' · '+eh(j.custName):'')+'</span><span class="job-total">'+fmt(j.invoiceTotal)+'</span></div>';
     }).join('');
+    const jobsInPeriodCount=jobsInPeriod.length;
     document.getElementById('jobs-list').innerHTML=allJobsHtml+
-      '<div class="job-row subtotal" style="border-top:2px solid var(--grey-border);font-family:\'Courier New\',monospace"><span>Jobs in period ('+jobsInPeriod.length+')</span><span class="job-total">'+fmt(invoicedTotal)+'</span></div>';
+      '<div class="job-row" style="border-top:2px solid var(--grey-border);font-family:\'Courier New\',monospace"><span>Jobs in period ('+jobsInPeriodCount+')</span><span class="job-total">'+fmt(invoicedTotal)+'</span></div>';
   }else{
     const manual=parseFloat(document.getElementById('manual-invoiced').value)||0;
     if(manual>0){invoicedTotal=manual;source='manual';}
-    document.getElementById('jobs-section-title').style.display='none';document.getElementById('jobs-list').innerHTML='';
+    document.getElementById('jobs-section-title').style.display='none';
+    document.getElementById('jobs-list').innerHTML='';
   }
-  const statusEl=document.getElementById('recon-status');const detailEl=document.getElementById('recon-detail');
-  if(source==='none'||bankTotal===0){statusEl.className='recon-status recon-empty';statusEl.textContent='Load bank CSVs and upload a JSON backup (or enter a manual total) to reconcile.';detailEl.style.display='none';return;}
-  detailEl.style.display='';
-  const diff=invoicedTotal-bankTotal;const diffAbs=Math.abs(diff);
-  let sc,sm;
-  if(diffAbs<=0.10){sc='recon-ok';sm='✓ Balanced — invoiced and received amounts match.';}
-  else if(diff>0){sc='recon-timing';sm='⚠ '+fmt(diffAbs)+' invoiced but not yet received — likely a timing difference.';document.getElementById('recon-timing-note').style.display='';}
-  else{sc='recon-diff';sm='✗ Bank received '+fmt(diffAbs)+' more than invoiced — check for uninvoiced payments or duplicates.';document.getElementById('recon-timing-note').style.display='none';}
-  statusEl.className='recon-status '+sc;statusEl.textContent=sm;
-  const srcLabel=source==='json'?'Reports app (JSON backup, jobs in period)':'Manual entry';
-  document.getElementById('recon-table').innerHTML=
-    '<thead><tr><th>Item</th><th class="right">Amount (inc. GST)</th><th class="right">Ex. GST</th></tr></thead><tbody>'+
-    '<tr><td>'+srcLabel+'</td><td class="right">'+fmt(invoicedTotal)+'</td><td class="right">'+fmt(invoicedTotal/11*10)+'</td></tr>'+
-    '<tr><td>Bank received (income account)</td><td class="right">'+fmt(bankTotal)+'</td><td class="right">'+fmt(bankTotal/11*10)+'</td></tr>'+
-    '<tr class="'+(diffAbs<=0.10?'match':diff>0?'timing':'mismatch')+'"><td><strong>Difference</strong></td><td class="right '+(diff<0?'red-t':'')+'"><strong>'+(diff>=0?'+':'')+fmtAmt(diff)+'</strong></td><td></td></tr></tbody>';
+
+  // Build the reconcile table and status based on source
+  if(source==='bank-only'){
+    // Bank loaded, no JSON or manual — show bank-only summary
+    statusEl.className='recon-status recon-bank-only';
+    statusEl.textContent='✓ Bank CSV loaded — '+fmt(bankTotal)+' received this period. Load reports app JSON backup above to cross-check against invoiced totals.';
+    document.getElementById('recon-section-label').textContent='Income received (bank)';
+    const fmt2=d=>new Date(d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+    const periodStr=(periodStart&&periodEnd)?fmt2(periodStart)+' → '+fmt2(periodEnd):'All loaded transactions';
+    document.getElementById('recon-table').innerHTML=
+      '<thead><tr><th>Item</th><th class="right">Amount (inc. GST)</th><th class="right">Ex. GST</th></tr></thead><tbody>'+
+      '<tr><td>The Car Guys income received</td><td class="right">'+fmt(bankTotal)+'</td><td class="right">'+fmt(bankTotal/11*10)+'</td></tr>'+
+      '<tr><td style="color:var(--text-muted);font-size:12px;">Period</td><td class="right" style="color:var(--text-muted);font-size:12px;">'+periodStr+'</td><td></td></tr>'+
+      '<tr><td style="color:var(--text-muted);font-size:12px;">GST collected (1/11)</td><td class="right" style="color:var(--blue);font-family:\'Courier New\',monospace;font-size:12px;">'+fmt(bankTotal/11)+'</td><td></td></tr>'+
+      '</tbody>';
+  }else{
+    // JSON or manual loaded — show full comparison
+    const srcLabel=source==='json'?'Reports app (JSON backup, jobs in period)':'Manual entry';
+    const diff=invoicedTotal-bankTotal;const diffAbs=Math.abs(diff);
+    let sc,sm;
+    if(diffAbs<=0.10){sc='recon-ok';sm='✓ Balanced — invoiced and received amounts match.';}
+    else if(diff>0){
+      sc='recon-timing';sm='⚠ '+fmt(diffAbs)+' invoiced but not yet received — likely a timing difference.';
+      document.getElementById('recon-timing-note').style.display='';
+    }else{
+      sc='recon-diff';sm='✗ Bank received '+fmt(diffAbs)+' more than invoiced — check for uninvoiced payments or duplicates.';
+    }
+    statusEl.className='recon-status '+sc;statusEl.textContent=sm;
+    document.getElementById('recon-section-label').textContent='Comparison';
+    document.getElementById('recon-table').innerHTML=
+      '<thead><tr><th>Item</th><th class="right">Amount (inc. GST)</th><th class="right">Ex. GST</th></tr></thead><tbody>'+
+      '<tr><td>'+srcLabel+'</td><td class="right">'+fmt(invoicedTotal)+'</td><td class="right">'+fmt(invoicedTotal/11*10)+'</td></tr>'+
+      '<tr><td>Bank received (income account)</td><td class="right">'+fmt(bankTotal)+'</td><td class="right">'+fmt(bankTotal/11*10)+'</td></tr>'+
+      '<tr class="'+(diffAbs<=0.10?'match':diff>0?'timing':'mismatch')+'"><td><strong>Difference</strong></td><td class="right '+(diff<0?'red-t':'')+'"><strong>'+(diff>=0?'+':'')+fmtAmt(diff)+'</strong></td><td></td></tr></tbody>';
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1041,32 +1077,78 @@ function updateTax(){
 }
 
 // ═══════════════════════════════════════════════════════
-//  INVOICE PDF PARSING
+//  PDF PARSING — SHARED CORE
+//
+//  parsePDFsIntoSharedState() is the single entry point for all PDF loading.
+//  It populates sharedPDFs (which invoices and payInvoices both reference).
+//  Call it from any upload zone; then refresh whichever tab's UI you need.
 // ═══════════════════════════════════════════════════════
 const invDrop=document.getElementById('inv-drop-zone');
 invDrop.addEventListener('dragover',e=>{e.preventDefault();invDrop.classList.add('dragover');});
 invDrop.addEventListener('dragleave',()=>invDrop.classList.remove('dragover'));
 invDrop.addEventListener('drop',e=>{e.preventDefault();invDrop.classList.remove('dragover');handleInvoicePDFs(e.dataTransfer.files);});
 
-async function handleInvoicePDFs(files){
+// Core parser — adds to sharedPDFs, deduplicates by filename
+async function parsePDFsIntoSharedState(files,callerContext){
   const pdfs=Array.from(files).filter(f=>f.name.toLowerCase().endsWith('.pdf'));
-  if(!pdfs.length){toast('No PDF files selected.');return;}
+  if(!pdfs.length){toast('No PDF files selected.');return 0;}
+  let added=0;
   for(const file of pdfs){
-    if(invoices.find(i=>i.filename===file.name))continue;
-    addInvFileItem(file.name,'processing','Reading…');
+    if(sharedPDFs.find(i=>i.filename===file.name))continue; // already parsed
+    // Show processing indicator on Invoices tab file list if that's the context
+    if(callerContext==='invoices')addInvFileItem(file.name,'processing','Reading…');
     try{
       const inv=await parseInvoicePDF(file);
-      invoices.push(inv);
-      updateInvFileItem(file.name,'done',inv.total?fmt(inv.total)+' extracted':'parsed');
+      sharedPDFs.push(inv);
+      added++;
+      if(callerContext==='invoices')updateInvFileItem(file.name,'done',inv.total?fmt(inv.total)+' extracted':'parsed');
     }catch(err){
-      invoices.push({filename:file.name,rego:'?',date:'?',vehicle:'?',total:0,gst:0,hasGST:false,error:err.message,status:'error'});
-      updateInvFileItem(file.name,'error','Parse error: '+err.message);
+      const errInv={filename:file.name,rego:'?',date:'?',vehicle:'?',total:0,gst:0,hasGST:false,error:err.message,status:'error'};
+      sharedPDFs.push(errInv);
+      if(callerContext==='invoices')updateInvFileItem(file.name,'error','Parse error: '+err.message);
     }
   }
+  // After parsing, cross-reference against JSON if available
+  if(reconJobs.length>0)crossRefInvoices();
+  // Sync the Payments tab zone badge
+  syncPaymentsPDFZone();
+  return added;
+}
+
+// Syncs the Payments tab upload zone badge to reflect sharedPDFs count
+function syncPaymentsPDFZone(){
+  const count=sharedPDFs.filter(i=>i.status!=='error').length;
+  if(count>0){
+    document.getElementById('pay-zone-pdf').classList.add('loaded');
+    document.getElementById('pay-pdf-icon').textContent='✅';
+    document.getElementById('pay-pdf-label').textContent=count+' invoice'+(count!==1?'s':'')+' loaded';
+  }
+}
+
+// Invoices tab entry point
+async function handleInvoicePDFs(files){
+  await parsePDFsIntoSharedState(files,'invoices');
   crossRefInvoices();
   renderInvoiceTable();
   updateDashboard();
   document.getElementById('inv-file-input').value='';
+}
+
+// Payments tab entry point — user explicitly drops on Payments tab zone
+async function handlePaymentPDFs(files){
+  const added=await parsePDFsIntoSharedState(files,'payments');
+  renderPayTable();
+  updateDashboard();
+  if(added>0){
+    // Also show them in the Invoices tab file list for completeness
+    Array.from(files).filter(f=>f.name.toLowerCase().endsWith('.pdf')).forEach(f=>{
+      if(!document.getElementById('invfi-'+f.name.replace(/[^a-z0-9]/gi,'_'))){
+        const inv=sharedPDFs.find(i=>i.filename===f.name);
+        if(inv)addInvFileItem(f.name,inv.error?'error':'done',inv.total?fmt(inv.total)+' extracted':inv.error||'parsed');
+      }
+    });
+  }
+  document.getElementById('pay-file-pdf').value='';
 }
 
 async function parseInvoicePDF(file){
@@ -1076,7 +1158,6 @@ async function parseInvoicePDF(file){
   for(let pn=1;pn<=pdf.numPages;pn++){
     const page=await pdf.getPage(pn);
     const content=await page.getTextContent();
-    // Build lines sorted by Y position
     const lineMap={};
     for(const item of content.items){
       if(!item.str||!item.str.trim())continue;
@@ -1089,24 +1170,20 @@ async function parseInvoicePDF(file){
     fullText+=lines.join('\n')+'\n';
   }
 
-  // Extract fields
   const inv={filename:file.name,rego:'',date:'',vehicle:'',total:0,gst:0,hasGST:false,status:'parsed'};
 
-  // Rego from filename FIRST and treat as authoritative
-  // CarGuys_1HDG710_Suzuki_SX4.pdf → 1HDG710
+  // Rego from filename first (authoritative)
   const fnMatch=file.name.match(/CarGuys_([A-Z0-9]{4,8})_/i);
   if(fnMatch)inv.rego=fnMatch[1].toUpperCase();
 
-  // Only scan PDF text for rego if filename didn't give us one
   if(!inv.rego){
     const regoPatterns=[
-      /REGISTRATION\s+([A-Z][A-Z0-9]{4,7})\b/i,  // must start with letter to avoid grabbing make names
+      /REGISTRATION\s+([A-Z][A-Z0-9]{4,7})\b/i,
       /REGO\s*[:\-]?\s*([A-Z][A-Z0-9]{4,7})\b/i,
     ];
     for(const re of regoPatterns){const m=fullText.match(re);if(m&&m[1]){inv.rego=m[1].toUpperCase();break;}}
   }
 
-  // Date
   const datePatterns=[
     /DATE\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
     /Generated\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
@@ -1114,24 +1191,18 @@ async function parseInvoicePDF(file){
   ];
   for(const re of datePatterns){const m=fullText.match(re);if(m&&m[1]){inv.date=m[1];break;}}
 
-  // Vehicle — from filename first (most reliable)
-  // CarGuys_1HDG710_Suzuki_SX4.pdf → "Suzuki SX4"
   const fnParts=file.name.replace('.pdf','').split('_');
   if(fnParts.length>=4){
     inv.vehicle=fnParts.slice(2).join(' ').replace(/__+/g,' ').trim();
   }
-  // Only use PDF text if filename didn't give a vehicle (non-standard filename)
   if(!inv.vehicle){
     const vehicleMatch=fullText.match(/VEHICLE\s+([A-Za-z][A-Za-z0-9\s\-]+?)(?:\s{2,}|\n|REGISTRATION|REGO|CUSTOMER|DATE)/i);
     if(vehicleMatch){
       const v=vehicleMatch[1].trim().replace(/\s+/g,' ').slice(0,40);
-      // Reject if it's just "REGISTRATION" or a single word that's clearly not a vehicle
       if(v&&!v.match(/^(REGISTRATION|REGO|CUSTOMER|DATE|CONTRACT|MECHANIC)$/i))inv.vehicle=v;
     }
   }
 
-  // TOTAL (inc. GST) — find the final total line
-  // Also search collapsed text (newlines → space) to catch wrapped table cells
   const collapsedText=fullText.replace(/\n+/g,' ').replace(/\s{2,}/g,' ');
   const totalPatterns=[
     /TOTAL\s*\(inc\.?\s*GST\)\s*\$?([\d,]+\.\d{2})/i,
@@ -1140,7 +1211,6 @@ async function parseInvoicePDF(file){
     /TOTAL\s*\(inc\.?\s*\n\s*GST\)\s*\$?\s*([\d,]+\.\d{2})/i,
     /TOTAL.*?\$([\d,]+\.\d{2})\s*$/im,
   ];
-  // Search both full text and collapsed text, take last match
   for(const re of totalPatterns){
     const src=re.source;const flags=re.flags.includes('g')?re.flags:re.flags+'g';
     const m1=[...fullText.matchAll(new RegExp(src,flags))];
@@ -1152,7 +1222,6 @@ async function parseInvoicePDF(file){
       break;
     }
   }
-  // Last resort — find the largest dollar amount near a TOTAL keyword
   if(!inv.total){
     const nearTotal=collapsedText.match(/TOTAL[^$]{0,30}\$([\d,]+\.\d{2})/gi);
     if(nearTotal&&nearTotal.length){
@@ -1161,16 +1230,12 @@ async function parseInvoicePDF(file){
     }
   }
 
-  // GST detection
   const gstMatch=fullText.match(/GST\s*\(10%\)\s*\$?([\d,]+\.\d{2})/i);
   if(gstMatch){inv.gst=parseFloat(gstMatch[1].replace(/,/g,''));inv.hasGST=true;}
   else{
-    // Check if there's a GST line at all
     inv.hasGST=/GST\s*\(10%\)/i.test(fullText);
     if(inv.hasGST&&inv.total)inv.gst=inv.total/11;
   }
-
-  // If no GST found at all — pre-GST or cash invoice
   if(!inv.hasGST)inv.gst=0;
 
   return inv;
@@ -1180,15 +1245,17 @@ async function parseInvoicePDF(file){
 //  CROSS-REFERENCE INVOICES VS JSON
 // ═══════════════════════════════════════════════════════
 function crossRefInvoices(){
-  if(!reconJobs.length)return;
-  invoices.forEach(inv=>{
-    // Match by rego (primary) — fuzzy on total within $1
+  if(!reconJobs.length){
+    // No JSON loaded — mark all as unchecked (not "missing", just not yet verified)
+    sharedPDFs.forEach(inv=>{ inv.inApp=undefined; inv.appTotal=null; });
+    return;
+  }
+  sharedPDFs.forEach(inv=>{
     const match=reconJobs.find(j=>{
       const regoMatch=j.rego&&inv.rego&&j.rego.toUpperCase()===inv.rego.toUpperCase();
       const totalMatch=Math.abs(j.invoiceTotal-inv.total)<1.0;
       return regoMatch&&totalMatch;
     })||reconJobs.find(j=>{
-      // Fallback: rego only (in case total was adjusted)
       return j.rego&&inv.rego&&j.rego.toUpperCase()===inv.rego.toUpperCase();
     });
     inv.inApp=!!match;
@@ -1200,33 +1267,33 @@ function crossRefInvoices(){
 //  INVOICE TABLE RENDER
 // ═══════════════════════════════════════════════════════
 function renderInvoiceTable(){
-  if(!invoices.length)return;
+  if(!sharedPDFs.length)return;
   document.getElementById('inv-results').style.display='';
 
   const filter=document.getElementById('inv-filter').value;
-  let rows=invoices;
-  if(filter==='found')rows=rows.filter(i=>i.inApp);
-  if(filter==='missing')rows=rows.filter(i=>!i.inApp&&i.status!=='error');
+  const hasJSON=reconJobs.length>0;
+  let rows=sharedPDFs;
+  if(filter==='found')rows=rows.filter(i=>i.inApp===true);
+  if(filter==='missing')rows=rows.filter(i=>i.inApp===false&&i.status!=='error');
   if(filter==='nogst')rows=rows.filter(i=>!i.hasGST);
 
-  const total=invoices.length;
-  const found=invoices.filter(i=>i.inApp).length;
-  const missing=invoices.filter(i=>!i.inApp&&i.status!=='error').length;
-  const nogst=invoices.filter(i=>!i.hasGST).length;
-  const totalValue=invoices.filter(i=>i.inApp!==false||true).reduce((s,i)=>s+i.total,0);
-  const missingValue=invoices.filter(i=>!i.inApp&&i.status!=='error').reduce((s,i)=>s+i.total,0);
+  const total=sharedPDFs.length;
+  const found=sharedPDFs.filter(i=>i.inApp===true).length;
+  const missing=sharedPDFs.filter(i=>i.inApp===false&&i.status!=='error').length;
+  const nogst=sharedPDFs.filter(i=>!i.hasGST).length;
+  const missingValue=sharedPDFs.filter(i=>i.inApp===false&&i.status!=='error').reduce((s,i)=>s+i.total,0);
 
   document.getElementById('inv-metrics').innerHTML=[
     {label:'Invoices uploaded',val:total,cls:'highlight'},
-    {label:'Found in reports app',val:found,cls:'green'},
-    {label:'Missing from app',val:missing,cls:missing>0?'red':'green'},
+    {label:hasJSON?'Found in reports app':'Cross-reference',val:hasJSON?found:'Load JSON',cls:hasJSON?'green':''},
+    {label:hasJSON?'Missing from app':'Status',val:hasJSON?(missing>0?missing:'None'):'No JSON loaded',cls:hasJSON&&missing>0?'red':''},
     {label:'No GST (pre-reg / cash)',val:nogst,cls:'amber'},
-    {label:'Missing value (inc. GST)',val:fmt(missingValue),cls:missing>0?'red':'green'},
-  ].map(m=>'<div class="metric '+m.cls+'"><div class="m-label">'+m.label+'</div><div class="m-val" style="'+(typeof m.val==='string'&&m.val.startsWith('$')?'font-size:17px':'')+'">'+m.val+'</div></div>').join('');
+    {label:hasJSON?'Missing value (inc. GST)':'',val:hasJSON?fmt(missingValue):'',cls:hasJSON&&missing>0?'red':''},
+  ].filter(m=>m.label).map(m=>'<div class="metric '+m.cls+'"><div class="m-label">'+m.label+'</div><div class="m-val" style="'+(typeof m.val==='string'&&m.val.startsWith('$')?'font-size:17px':'')+'">'+m.val+'</div></div>').join('');
 
   document.getElementById('inv-count').textContent=rows.length+' invoice'+(rows.length!==1?'s':'');
 
-  const missing_exists=invoices.some(i=>!i.inApp&&i.status!=='error');
+  const missing_exists=hasJSON&&sharedPDFs.some(i=>i.inApp===false&&i.status!=='error');
   document.getElementById('btn-export-missing').style.display=missing_exists?'':'none';
 
   const tbody=document.getElementById('inv-body');
@@ -1237,8 +1304,9 @@ function renderInvoiceTable(){
   tbody.innerHTML=rows.map(inv=>{
     let statusPill;
     if(inv.status==='error')statusPill='<span class="status-pill pill-error">⚠ Parse error</span>';
+    else if(!hasJSON)statusPill='<span class="status-pill pill-nocrossref">No JSON loaded</span>';
     else if(!inv.hasGST)statusPill='<span class="status-pill pill-nogst">No GST</span>';
-    else if(inv.inApp)statusPill='<span class="status-pill pill-found">✓ In app</span>';
+    else if(inv.inApp===true)statusPill='<span class="status-pill pill-found">✓ In app</span>';
     else statusPill='<span class="status-pill pill-missing">✗ Missing</span>';
 
     const gstCell=inv.hasGST?fmt(inv.gst):'<span style="color:var(--text-muted)">—</span>';
@@ -1257,8 +1325,10 @@ function renderInvoiceTable(){
 
 function addInvFileItem(name,status,msg){
   const list=document.getElementById('inv-file-list');
+  const id='invfi-'+name.replace(/[^a-z0-9]/gi,'_');
+  if(document.getElementById(id))return; // already added
   const div=document.createElement('div');
-  div.className='inv-file-item '+status;div.id='invfi-'+name.replace(/[^a-z0-9]/gi,'_');
+  div.className='inv-file-item '+status;div.id=id;
   div.innerHTML='<span style="font-size:18px">'+(status==='done'?'✅':status==='error'?'❌':'⏳')+'</span>'+
     '<span class="inv-fi-name" title="'+eh(name)+'">'+eh(name)+'</span>'+
     '<span class="inv-fi-status" id="invfis-'+name.replace(/[^a-z0-9]/gi,'_')+'">'+msg+'</span>';
@@ -1276,7 +1346,7 @@ function updateInvFileItem(name,status,msg){
 //  INVOICE EXPORTS
 // ═══════════════════════════════════════════════════════
 function exportMissingJSON(){
-  const missing=invoices.filter(i=>!i.inApp&&i.status!=='error');
+  const missing=sharedPDFs.filter(i=>i.inApp===false&&i.status!=='error');
   if(!missing.length){toast('No missing invoices to export.');return;}
   const jobs=missing.map(inv=>({
     jobId:'recovered-'+uid(),
@@ -1301,9 +1371,9 @@ function exportMissingJSON(){
 }
 
 function exportInvoiceCSV(){
-  if(!invoices.length){toast('No invoices loaded.');return;}
+  if(!sharedPDFs.length){toast('No invoices loaded.');return;}
   const header='Filename,Rego,Date,Vehicle,Total (inc GST),GST,Has GST,In App\n';
-  const rows=invoices.map(i=>[
+  const rows=sharedPDFs.map(i=>[
     '"'+i.filename+'"','"'+i.rego+'"','"'+i.date+'"','"'+(i.vehicle||'')+'"',
     i.total.toFixed(2),i.gst.toFixed(2),i.hasGST?'Yes':'No',
     i.inApp===undefined?'Not checked':i.inApp?'Yes':'No'
@@ -1337,7 +1407,7 @@ function exportCSV(){
 let currentTab='dashboard';
 
 function clearCurrentTab(){
-  if(currentTab==='dashboard'||currentTab==='upload'||currentTab==='transactions'||currentTab==='bas'||currentTab==='reconcile'||currentTab==='tax') clearBankData();
+  if(['dashboard','upload','transactions','bas','reconcile','tax'].includes(currentTab)) clearBankData();
   else if(currentTab==='invoices') clearInvoices();
   else if(currentTab==='payments') clearPayments();
 }
@@ -1352,51 +1422,49 @@ function clearBankData(){
   });
   document.getElementById('zone-json').classList.remove('loaded');
   document.getElementById('json-icon').textContent='📋';
-  document.getElementById('json-label').textContent='JW Reports backup';
+  document.getElementById('json-label').innerHTML='Reports app backup <span style="font-size:10px;font-weight:normal;color:var(--text-muted)">(optional)</span>';
   document.getElementById('manual-invoiced').value='';
   document.getElementById('btn-proceed').style.display='none';
   ['quarter-display','bas-quarter'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-  renderTable();updateBAS();updateReconcile();updateTax();
+  renderTable();updateBAS();updateReconcile();updateTax();updateDashboard();
   toast('Bank data cleared.');
 }
 
 function clearInvoices(){
-  if(!confirm('Clear all uploaded invoices?'))return;
-  invoices=[];
+  if(!confirm('Clear all uploaded invoices? This will also clear Payments tab PDF data.'))return;
+  sharedPDFs.length=0; // clear in place so both aliases (invoices, payInvoices) see the change
   document.getElementById('inv-file-list').innerHTML='';
   document.getElementById('inv-results').style.display='none';
+  // Reset payments PDF zone
+  document.getElementById('pay-zone-pdf').classList.remove('loaded');
+  document.getElementById('pay-pdf-icon').textContent='📄';
+  document.getElementById('pay-pdf-label').textContent='Invoice PDFs';
+  // Reset dashboard zone
+  document.getElementById('dash-zone-pdf').classList.remove('loaded');
+  document.getElementById('dash-pdf-icon').textContent='📄';
+  document.getElementById('dash-pdf-label').textContent='Drop invoice PDFs';
+  updateDashboard();
   toast('Invoices cleared.');
 }
 
 function clearPayments(){
-  if(!confirm('Clear payments tab data?'))return;
-  payInvoices=[];payPayments=[];
-  // Reset upload zones
-  document.getElementById('pay-zone-pdf').classList.remove('loaded');
-  document.getElementById('pay-pdf-icon').textContent='📄';
-  document.getElementById('pay-pdf-label').textContent='Invoice PDFs';
+  if(!confirm('Clear payments bank CSV? (Invoice PDFs are shared — clear them from the Invoices tab.)'))return;
+  payPayments=[];
   document.getElementById('pay-zone-csv').classList.remove('loaded');
   document.getElementById('pay-csv-icon').textContent='📊';
   document.getElementById('pay-csv-label').textContent='Income bank CSV';
   document.getElementById('pay-results').style.display='none';
-  document.getElementById('pay-file-pdf').value='';
   document.getElementById('pay-file-csv').value='';
-  toast('Payments data cleared.');
+  updateDashboard();
+  toast('Payment CSV cleared.');
 }
-
-function clearAll(){clearBankData();}// legacy — keeps any old references working
 
 // ═══════════════════════════════════════════════════════
 //  PAYMENTS TAB
 // ═══════════════════════════════════════════════════════
-
-// Extract rego from a Melissa Farquhar bank transfer description
 function extractRegoFromDesc(desc){
-  // New format: "TRANSFER RTP 1HXQ129 CTBAAUSNXXXN... MELISSA FARQUHAR ... 1HXQ129 ..."
-  // Rego appears right after "TRANSFER RTP " at the start
   const rtpMatch=desc.match(/TRANSFER\s+RTP\s+([A-Z0-9]{4,8})\s/i);
   if(rtpMatch)return rtpMatch[1].toUpperCase();
-  // Fallback: scan for any rego-like token (5-8 alphanumeric, not pure numbers)
   const tokens=desc.split(/\s+/);
   for(const t of tokens){
     if(/^[A-Z0-9]{5,8}$/.test(t)&&/[A-Z]/.test(t)&&!/^(TRANSFER|MELISSA|FARQUHAR|CTBAAUSNXXXN|INTERNET|BANKING|SALARY|AUD|CREDIT|INTEREST)$/i.test(t)){
@@ -1406,7 +1474,6 @@ function extractRegoFromDesc(desc){
   return null;
 }
 
-// Parse payments CSV (income account - same format as main CSV)
 function loadPayCSV(file){
   if(!file)return;
   const reader=new FileReader();
@@ -1429,54 +1496,23 @@ function loadPayCSV(file){
     document.getElementById('pay-csv-icon').textContent='✅';
     document.getElementById('pay-csv-label').textContent=file.name+' — '+payPayments.length+' payments';
     matchAndRender();
+    updateReconcile();
     toast('✓ Loaded '+payPayments.length+' Melissa payments');
     document.getElementById('pay-file-csv').value='';
   };
   reader.readAsText(file);
 }
 
-// Load invoice PDFs for payments tab — reuse parseInvoicePDF
-async function loadPayPDFs(files){
-  const pdfs=Array.from(files).filter(f=>f.name.toLowerCase().endsWith('.pdf'));
-  if(!pdfs.length){toast('No PDFs selected.');return;}
-  payInvoices=[];
-  document.getElementById('pay-zone-pdf').classList.remove('loaded');
-  document.getElementById('pay-pdf-icon').textContent='⏳';
-  document.getElementById('pay-pdf-label').textContent='Reading '+pdfs.length+' PDFs…';
-  for(const file of pdfs){
-    try{
-      const inv=await parseInvoicePDF(file);
-      payInvoices.push(inv);
-    }catch(e){
-      payInvoices.push({filename:file.name,rego:extractRegoFromFilename(file.name),date:'?',vehicle:'?',total:0,gst:0,hasGST:false,error:e.message});
-    }
-  }
-  payInvoices.sort((a,b)=>parseDateSortDMY(a.date)-parseDateSortDMY(b.date));
-  document.getElementById('pay-zone-pdf').classList.add('loaded');
-  document.getElementById('pay-pdf-icon').textContent='✅';
-  document.getElementById('pay-pdf-label').textContent=pdfs.length+' invoices loaded';
-  matchAndRender();
-  toast('✓ Loaded '+pdfs.length+' invoices');
-  document.getElementById('pay-file-pdf').value='';
-}
-
-function extractRegoFromFilename(name){
-  const m=name.match(/CarGuys_([A-Z0-9]+)_/i);
-  return m?m[1].toUpperCase():'?';
-}
-
-// Core matching: by rego
 function buildMatches(){
   const results=[];
   const usedPayments=new Set();
 
-  // For each invoice, find a matching payment
-  for(const inv of payInvoices){
+  for(const inv of sharedPDFs){
+    if(inv.status==='error')continue;
     const payment=payPayments.find((p,idx)=>!usedPayments.has(idx)&&p.rego.toUpperCase()===inv.rego.toUpperCase());
     if(payment){
       const pidx=payPayments.indexOf(payment);
       usedPayments.add(pidx);
-      const diff=payment.amount-inv.total;
       results.push({
         type:'invoice',
         rego:inv.rego,
@@ -1485,7 +1521,7 @@ function buildMatches(){
         invoiceTotal:inv.total,
         received:payment.amount,
         paymentDate:payment.date,
-        diff,
+        diff:payment.amount-inv.total,
         status:'paid',
         filename:inv.filename,
       });
@@ -1505,7 +1541,6 @@ function buildMatches(){
     }
   }
 
-  // Any payments with no matching invoice = paid for draft/unfinished work
   payPayments.forEach((p,idx)=>{
     if(!usedPayments.has(idx)){
       results.push({
@@ -1527,14 +1562,14 @@ function buildMatches(){
 }
 
 function matchAndRender(){
-  if(!payInvoices.length&&!payPayments.length)return;
+  if(!sharedPDFs.length&&!payPayments.length)return;
   document.getElementById('pay-results').style.display='';
   renderPayTable();
   updateDashboard();
 }
 
 function renderPayTable(){
-  if(!payInvoices.length&&!payPayments.length)return;
+  if(!sharedPDFs.length&&!payPayments.length)return;
   const matches=buildMatches();
   const filter=document.getElementById('pay-filter').value;
 
@@ -1545,7 +1580,6 @@ function renderPayTable(){
 
   document.getElementById('pay-count').textContent=rows.length+' item'+(rows.length!==1?'s':'');
 
-  // Metrics
   const paid=matches.filter(m=>m.status==='paid');
   const unpaid=matches.filter(m=>m.status==='unpaid');
   const surplus=matches.filter(m=>m.status==='surplus');
@@ -1555,7 +1589,7 @@ function renderPayTable(){
   const totalSurplus=surplus.reduce((s,m)=>s+m.received,0);
 
   document.getElementById('pay-metrics').innerHTML=[
-    {label:'Invoices uploaded',val:payInvoices.length,cls:'highlight'},
+    {label:'Invoices uploaded',val:sharedPDFs.filter(i=>i.status!=='error').length,cls:'highlight'},
     {label:'✓ Paid — archive',val:paid.length,cls:'green'},
     {label:'✗ Unpaid — keep',val:unpaid.length,cls:unpaid.length>0?'red':'green'},
     {label:'Paid — no invoice yet',val:surplus.length,cls:surplus.length>0?'amber':''},
@@ -1593,7 +1627,6 @@ function renderPayTable(){
       '</div>';
   }).join('');
 
-  // Summary bar
   const net=totalReceived-totalInvoiced;
   document.getElementById('pay-summary').innerHTML=
     '<div class="ps-item"><div class="ps-label">Total invoiced</div><div class="ps-val">'+fmt(totalInvoiced)+'</div></div>'+
@@ -1625,7 +1658,6 @@ function exportPayCSV(){
 
 // Init
 renderTable();updateBAS();updateReconcile();updateTax();updateDashboard();
-// Hide all tabs except dashboard on load
 ['upload','transactions','bas','reconcile','tax','invoices','payments'].forEach(t=>{
   document.getElementById('tab-'+t).style.display='none';
 });
